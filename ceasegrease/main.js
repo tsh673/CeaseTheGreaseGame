@@ -2,13 +2,13 @@
 var mainState = {
     preload: function() { 
         // This function will be executed at the beginning     
-        // That's where we load the images and sounds 
+        // That's where we load the images
 		// Load the droplet sprite
 		game.load.image('droplet', 'assets/droplet.png'); 
 		
 		game.load.image('oil', 'assets/oil.png');
 		
-	//	game.load.image('fish', 'assets/fish.png');
+		game.load.image('menu', 'assets/pause.png');
     },
 
     create: function() { 
@@ -17,6 +17,60 @@ var mainState = {
 		// Change the background color of the game to blue
 		game.stage.backgroundColor = '#71c5cf';
 
+		// Pause screen code
+		this.enter = game.input.keyboard.addKey(Phaser.Keyboard.ENTER);this.enter.onDown.add(function() {
+			// When the enter button is pressed, we pause the game
+			game.paused = true;
+
+			// Then add the menu
+			menu = game.add.sprite(400/2, 490/2, 'menu');
+			menu.anchor.setTo(0.5, 0.5);
+
+			// And a label to illustrate which menu item was chosen. (This is not necessary)
+			choseLabel = game.add.text(400/2, 490-125, 'Click outside menu to resume', { font: '30px Arial', fill: '#fff' });
+			choseLabel.anchor.setTo(0.5, 0.5);
+		}, this);
+
+		// Add a input listener that can help us return from being paused
+		game.input.onDown.add(unpause, self);
+		
+		// And finally the method that handles the pause menu
+		function unpause(event){
+			// Only act if paused
+			if(game.paused){
+				// Calculate the corners of the menu
+				var x1 = 400/2 - 270/2, x2 = 400/2 + 270/2,
+					y1 = 490/2 - 180/2, y2 = 490/2 + 180/2;
+
+				// Check if the click was inside the menu
+				if(event.x > x1 && event.x < x2 && event.y > y1 && event.y < y2 ){
+					// The choicemap is an array that will help us see which item was clicked
+					var chosemap = ['Main Menu', 'Learn More'];
+
+					// Get menu local coordinates for the click
+					var x = event.x - x1,
+						y = event.y - y1;
+
+					// Calculate the choice 
+					var chose = Math.floor(x / 90) + 3*Math.floor(y / 90);
+
+					// Display the choice
+					if(chose == 0 || chose == 1 || chose == 2)
+						choseLabel.text = 'Chosen item: ' + chosemap[0];
+					else
+						choseLabel.text = 'Chosen item: ' + chosemap[1];
+				}
+				else{
+					// Remove the menu and the label
+					menu.destroy();
+					choseLabel.destroy();
+
+					// Unpause the game
+					game.paused = false;
+				}
+			}
+		};
+		
 		// Set the physics system
 		game.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -38,12 +92,8 @@ var mainState = {
 		// Create an empty group
 		this.oils = game.add.group(); 
 		
-	//	this.fishes = game.add.group(); 
-		
 		this.timer = game.time.events.loop(1500, this.addRowOfOils, this); 
-    
-	//	this.timer = game.time.events.loop(1500, this.addRowOfFishes, this);
-	
+  
 		this.score = 0;
 		this.labelScore = game.add.text(20, 20, "0", 
 			{ font: "30px Arial", fill: "#ffffff" });   
@@ -59,9 +109,6 @@ var mainState = {
 		
 		game.physics.arcade.overlap(
 			this.droplet, this.oils, this.restartGame, null, this);
-			
-	//	game.physics.arcade.overlap(
-	//		this.droplet, this.fishes, this.restartGame, null, this);
     },
 	
 	// Make the droplet jump 
@@ -69,7 +116,6 @@ var mainState = {
 		// Add a vertical velocity to the droplet
 		this.droplet.body.velocity.y = -350;
 	},
-
 	// Restart the game
 	restartGame: function() {
 		// Start the 'main' state, which restarts the game
@@ -93,36 +139,11 @@ var mainState = {
 		oil.checkWorldBounds = true;
 		oil.outOfBoundsKill = true;
 	},
-/*
-	addOneFish: function(x, y) {
-		// Create a fish at the position x and y
-		var fish = game.add.sprite(x, y, 'fish');
-
-		// Add the fish to our previously created group
-		this.fishes.add(fish);
-
-		// Enable physics on the fish 
-		game.physics.arcade.enable(fish);
-
-		// Add velocity to the fish to make it move left
-		fish.body.velocity.x = -200; 
-
-		// Automatically kill the fish when it's no longer visible 
-		fish.checkWorldBounds = true;
-		fish.outOfBoundsKill = true;
-	},
-*/
 	addRowOfOils: function() {
 		// Randomly pick a number between 1 and 5
 		// This will be the hole position
 		var hole = Math.floor(Math.random() * 5) + 1;
 
-		// Add the 6 oil spills 
-		// With one big hole at position 'hole' and 'hole + 1'
-		//for (var i = 0; i < 8; i++)
-		//	if (i != hole && i != hole + 1) 
-		//		this.addOneOil(400, i * 60 + 10);   
-		
 		for (var i = 0; i < 8; i++)
 			if (i == hole) 
 				this.addOneOil(400, i * 60 + 10);
@@ -130,26 +151,6 @@ var mainState = {
 		this.score += 1;
 		this.labelScore.text = this.score;  
 	},
-/*	
-	addRowOfFishes: function() {
-		// Randomly pick a number between 1 and 5
-		// This will be the hole position
-		var hole2 = Math.floor(Math.random() * 5) + 1;
-
-		// Add the 6 oil spills 
-		// With one big hole at position 'hole' and 'hole + 1'
-		//for (var i = 0; i < 8; i++)
-		//	if (i != hole && i != hole + 1) 
-		//		this.addOneOil(400, i * 60 + 10);   
-		
-		for (var i = 0; i < 8; i++)
-			if (i == hole2) 
-				this.addOneFish(400, i * 60 + 20);
-				
-		this.score += 1;
-		this.labelScore.text = this.score;  
-	},
-*/
 };
 
 // Initialize Phaser, and create a 400px by 490px game
