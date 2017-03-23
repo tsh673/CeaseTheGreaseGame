@@ -1,4 +1,6 @@
 // Create our 'main' state that will contain the game
+var mainMusic;
+
 var mainState = {
     preload: function() { 
         // This function will be executed at the beginning     
@@ -9,6 +11,9 @@ var mainState = {
 		game.load.image('oil', 'assets/oil.png');
 		
 		game.load.image('menu', 'assets/pause.png');
+		
+		//Load main game music
+		game.load.audio('main', ['assets/main_music.mp3', 'assets/main_music.ogg']);
     },
 
     create: function() { 
@@ -96,7 +101,11 @@ var mainState = {
   
 		this.score = 0;
 		this.labelScore = game.add.text(20, 20, "0", 
-			{ font: "30px Arial", fill: "#ffffff" });   
+			{ font: "30px Arial", fill: "#ffffff" });  
+
+		//Music
+			mainMusic = game.add.audio('main');
+			mainMusic.play();
 	},
 
     update: function() {
@@ -119,6 +128,7 @@ var mainState = {
 	// Restart the game
 	restartGame: function() {
 		// Start the 'main' state, which restarts the game
+		mainMusic.stop();
 		game.state.start('main');
 	},
 	
