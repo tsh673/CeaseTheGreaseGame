@@ -1,11 +1,14 @@
 // Property of Texas A&M Cease the Grease CSCE 482 Taylor Harris, Victor Martinez, Chance Eckert 
 
+var mainMusic;
+
 var mainState = {
     preload: function() 
 	{          
 		game.load.image('droplet', 'assets/droplet.png'); // Load droplet image
 		game.load.image('oil', 'assets/oil.png'); // Load oil image
 		game.load.image('menu', 'assets/pause.png'); // Load pause menu options image
+		game.load.audio('main', ['assets/main_music.mp3', 'assets/main_music.ogg']); // Load main game music
     },
 
     create: function() 
@@ -77,12 +80,18 @@ var mainState = {
   
 		score = 0;	// Score initialized to zero and displayed at the top left corner of the screen
 		labelScore = game.add.text(20, 20, "0", { font: "30px Arial", fill: "#ffffff" });   
+
+		mainMusic = game.add.audio('main'); // Music
+		mainMusic.play();
 	},
 
     update: function() // This function is called 60 times per second
 	{
 		if (this.droplet.y < 0 || this.droplet.y > 490)
+		{
+			mainMusic.stop();
 			game.state.start('end'); // If the droplet is out of the screen, end the game
+		}
 		
 		game.physics.arcade.overlap(this.droplet, this.oils, this.endGame, null, this); // If the droplet and oil overlap, end the game
     },
@@ -91,9 +100,10 @@ var mainState = {
 	{ 
 		this.droplet.body.velocity.y = -350; // Add a vertical velocity to the droplet
 	},
-	
+
 	endGame: function() // End the game
 	{
+		mainMusic.stop();
 		game.state.start('end');
 	},
 	
