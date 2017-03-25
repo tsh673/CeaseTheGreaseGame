@@ -189,7 +189,7 @@ var gameOverState = {
 			}
 			
 			this.enter2 = game.input.keyboard.addKey(Phaser.Keyboard.ENTER);this.enter2.onDown.add(function() { // When the enter key is pressed
-				localStorage.setItem(word, score.toString()); // Store initials and score for leaderboard
+				localStorage.setItem(score.toString(), word); // Store initials and score for leaderboard
 			
 				game.state.start('leader');	// Go to leaderboard
 			}, this);
@@ -216,13 +216,21 @@ var leaderboardState = {
 		leaderboardLabel = game.add.text(game.world.centerX, game.world.centerY - 200, 'Leaderboard', { font: '30px Arial', fill: '#fff' }); // Leaderboard text
 		leaderboardLabel.anchor.setTo(0.5, 0.5);
 			
-		var i = 0;
-		for (var key in localStorage) // Iterate through every initials/score pair
+		if(localStorage.length > 0)
 		{
-			scoreLabel = game.add.text(game.world.centerX, 100 + (i*30), key.toString() + "             " + localStorage[key].toString(), { font: '20px Arial', fill: '#fff' }); // Display initials and score
+			var localStorageArray = new Array();
+			for (var i = 0; i < localStorage.length; i++)
+			{
+				localStorageArray[i] = Number(localStorage.key(i)); // Put scores in an array so they can be sorted
+			}
+			localStorageArray.sort(function(a,b) { return b - a; }); // Sort scores in decreasing order
+
+		}
+			
+		for (var n = 0; n < localStorageArray.length && n < 9; n++) // Iterate through every initials/score pair
+		{
+			scoreLabel = game.add.text(game.world.centerX, 100 + (n*30), localStorage.getItem(localStorageArray[n]) + "             " + localStorageArray[n], { font: '20px Arial', fill: '#fff' }); // Display top 9 initials and score
 			scoreLabel.anchor.setTo(0.5, 0.5);
-				
-			i++; // Increment counter 
 		}
 			
 		var mainMenuButton = game.add.button(game.world.centerX, game.world.centerY + 175, 'mainmenu', function() {game.state.start('menu');}, this, 2, 1, 0); // Main menu button
