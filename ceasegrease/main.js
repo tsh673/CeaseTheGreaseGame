@@ -44,13 +44,13 @@ var mainState = {
 					
 					if(selection == 0 || selection == 1 || selection == 2) // Display the choice
 					{
-						//game.state.start('menu');
-						pauseLabel.text = "Chosen item: " + selectionMap[0];
+						game.paused = false; // Unpause the game
+						game.state.start('menu'); // Go to main menu
 					}	 
 					else
 					{
-						//game.state.start('learn');
-						pauseLabel.text = "Chosen item: " + selectionMap[1];
+						game.paused = false; // Unpause the game
+						game.state.start('learn'); // Go to learn more
 					}		
 				}
 				else
@@ -224,15 +224,13 @@ var leaderboardState = {
 				localStorageArray[i] = Number(localStorage.key(i)); // Put scores in an array so they can be sorted
 			}
 			localStorageArray.sort(function(a,b) { return b - a; }); // Sort scores in decreasing order
-
-		}
-			
-		for (var n = 0; n < localStorageArray.length && n < 9; n++) // Iterate through every initials/score pair
-		{
-			scoreLabel = game.add.text(game.world.centerX, 100 + (n*30), localStorage.getItem(localStorageArray[n]) + "             " + localStorageArray[n], { font: '20px Arial', fill: '#fff' }); // Display top 9 initials and score
-			scoreLabel.anchor.setTo(0.5, 0.5);
-		}
-			
+		
+			for (var n = 0; n < localStorageArray.length && n < 9; n++) // Iterate through every initials/score pair
+			{
+				scoreLabel = game.add.text(game.world.centerX, 100 + (n*30), localStorage.getItem(localStorageArray[n]) + "             " + localStorageArray[n], { font: '20px Arial', fill: '#fff' }); // Display top 9 initials and score
+				scoreLabel.anchor.setTo(0.5, 0.5);
+			}
+		}	
 		var mainMenuButton = game.add.button(game.world.centerX, game.world.centerY + 175, 'mainmenu', function() {game.state.start('menu');}, this, 2, 1, 0); // Main menu button
 		mainMenuButton.anchor.setTo(0.5, 0.5);
 	},
