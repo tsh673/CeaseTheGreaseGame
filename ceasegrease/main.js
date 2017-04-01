@@ -5,23 +5,25 @@ var mainMusic;
 var mainState = {
     preload: function() 
 	{          
-		game.load.image('droplet', 'assets/droplet.png'); // Load droplet image
+		game.load.spritesheet('droplet', 'assets/droppp.png', 37, 62); // Load droplet animation frames	
+		game.load.image('background', 'assets/background7.png'); // Load background image
 		game.load.image('oil', 'assets/oil.png'); // Load oil image
-		game.load.image('menu', 'assets/pause.png'); // Load pause menu options image
+		game.load.image('pausemenu', 'assets/pausemenu.png'); // Load pause menu image
 		game.load.audio('main', ['assets/main_music.mp3', 'assets/main_music.ogg']); // Load main game music
     },
 
     create: function() 
 	{   
+		game.stage.backgroundColor = 'rgb(154,129,83)'; //Background color to match image
+		
+		backgroundPipe = game.add.sprite(0, 45, 'background'); // Add background image
+	
 		this.enter = game.input.keyboard.addKey(Phaser.Keyboard.ENTER);this.enter.onDown.add(function() { // When enter key is pressed, game is paused
 			
 			game.paused = true; // Pause game 
 
-			menu = game.add.sprite(400/2, 490/2, 'menu'); // Add pause menu options image
-			menu.anchor.setTo(0.5, 0.5);
-
-			pauseLabel = game.add.text(400/2, 490-125, 'Click outside menu to resume', { font: '30px Arial', fill: '#fff' }); // Pause menu text 
-			pauseLabel.anchor.setTo(0.5, 0.5);
+			pauseMenu = game.add.sprite(400/2, 490/2, 'pausemenu'); // Add pause menu options image
+			pauseMenu.anchor.setTo(0.5, 0.5);
 		}, this);
 
 		game.input.onDown.add(unpause, self); // Input listener to unpause game when user clicks outside of the menu options
@@ -35,8 +37,6 @@ var mainState = {
 
 				if(event.x > x1 && event.x < x2 && event.y > y1 && event.y < y2 ) // Check if the click was inside the menu
 				{
-					var selectionMap = ['Main Menu', 'Learn More'];
-
 					var x = event.x - x1,
 						y = event.y - y1; // Get menu local coordinates for the click
  
@@ -44,29 +44,27 @@ var mainState = {
 					
 					if(selection == 0 || selection == 1 || selection == 2) // Display the choice
 					{
+						pauseMenu.destroy(); // Remove pause menu image
 						game.paused = false; // Unpause the game
-						game.state.start('menu'); // Go to main menu
 					}	 
 					else
 					{
 						game.paused = false; // Unpause the game
-						game.state.start('learn'); // Go to learn more
+						game.state.start('menu'); // Go to main menu
 					}		
-				}
-				else
-				{
-					menu.destroy(); // Remove pause menu options
-					pauseLabel.destroy(); // Remove pause menu text
-
-					game.paused = false; // Unpause the game
 				}
 			}
 		};
 		
 		game.physics.startSystem(Phaser.Physics.ARCADE);
 
-		this.droplet = game.add.sprite(100, 245, 'droplet'); // Display droplet at 100, 245
-
+		this.droplet = game.add.sprite(100, 245, 'droplet'); // Add droplet sprite at 50,175
+		this.droplet.frame = 0; // Default frame is the first frame at position 0
+		
+		this.droplet.animations.add('jet', [0,1,2], 2, true); // Animate the droplet
+		
+		this.droplet.animations.play('jet'); // Play droplet animation
+		
 		game.physics.arcade.enable(this.droplet); // Add physics to droplet
 		
 		this.droplet.body.gravity.y = 1000; // Makes droplet fall 
@@ -79,8 +77,11 @@ var mainState = {
 		this.timer = game.time.events.loop(1500, this.addRowOfOils, this); 
   
 		score = 0;	// Score initialized to zero and displayed at the top left corner of the screen
-		labelScore = game.add.text(20, 20, "0", { font: "30px Arial", fill: "#ffffff" });   
-
+		scoreLabel = game.add.text(20, 20, "0");   
+		scoreLabel.font = "Press Start 2P";
+		scoreLabel.fill = "#fff"; // White color
+		scoreLabel.fontSize = 30;
+		
 		mainMusic = game.add.audio('main'); // Music
 		mainMusic.play();
 	},
@@ -90,7 +91,7 @@ var mainState = {
 		if (this.droplet.y < 0 || this.droplet.y > 490)
 		{
 			mainMusic.stop();
-			game.state.start('end'); // If the droplet is out of the screen, end the game
+			game.state.start('over'); // If the droplet is out of the screen, end the game
 		}
 		
 		game.physics.arcade.overlap(this.droplet, this.oils, this.endGame, null, this); // If the droplet and oil overlap, end the game
@@ -104,7 +105,7 @@ var mainState = {
 	endGame: function() // End the game
 	{
 		mainMusic.stop();
-		game.state.start('end');
+		game.state.start('over');
 	},
 	
 	addOneOil: function(x, y) 
@@ -130,48 +131,167 @@ var mainState = {
 				this.addOneOil(400, i * 60 + 10);
 				
 		score += 1;
-		labelScore.text = score;  
+		scoreLabel.text = score;  
 	},
 };
 
 var gameOverState = {
 
 	preload: function() 
-	{      
-		game.load.image('mainmenu', 'assets/mainmenu.png'); // Load main menu image
-		game.load.image('leaderboard', 'assets/leaderboard.png'); // Load leader board image
-		game.load.image('learnmore', 'assets/learnmore.png'); // Load learn more image
+	{   
+		game.load.image('gameover', 'assets/gameover.png'); // Load game over image
+		game.load.image('dead', 'assets/dead.png') // Load dead droplet image
 	},
 
 	create: function () 
 	{
-		gameOverLabel = game.add.text(game.world.centerX, game.world.centerY - 190, 'GAME OVER', { font: '40px Arial', fill: '#fff' }); // Game over text
-		gameOverLabel.anchor.setTo(0.5, 0.5);
+		game.stage.backgroundColor = 'rgb(0,0,0)'; //Background color black
+	
+		gameOver = game.add.sprite(game.world.centerX, 245, 'gameover'); // Add game over image
+		gameOver.anchor.setTo(0.5, 0.5);
+	/*	
+		this.deadDrop = game.add.sprite(game.world.centerX, 0, 'dead'); // Add dead droplet image
+		this.deadDrop.anchor.setTo(0.5, 0.5);
+	
+		game.physics.arcade.enable(this.deadDrop); // Add physics to dead droplet
 		
-		var mainMenuButton = game.add.button(game.world.centerX, game.world.centerY - 100, 'mainmenu', function() {game.state.start('menu');}, this, 2, 1, 0); // Main menu button
-		mainMenuButton.anchor.setTo(0.5, 0.5);
+		this.deadDrop.body.gravity.y = 500; // Makes dead droplet fall 
+	*/	
+		timer = 0;
+		
+		gameOverLabel = game.add.text(game.world.centerX, game.world.centerY + 200, 'Click anywhere to continue'); // Click anywhere to continue text
+		gameOverLabel.anchor.setTo(0.5, 0.5);
+		gameOverLabel.font = "Press Start 2P";
+		gameOverLabel.fill = "#fff"; //White text
+		gameOverLabel.fontSize = 10; 
+		
+		game.input.onDown.add(function() {game.state.start('score');}, self); // Input listener go to score screen on mouse click
+	},
+	
+	update: function () 
+	{
+	/*
+		if (this.deadDrop.y >= 200)
+		{
+			console.log("hey");
+			this.deadDrop.body.gravity.y = 0;
+		}
+	*/
+		//Used to make text blink
+		timer += game.time.elapsed;
+		if (timer >= 500)
+		{
+			timer -= 500;
+			gameOverLabel.visible = !gameOverLabel.visible;
+		}
+	},
+};
+
+var leaderboardState = {
+	
+	preload: function() 
+	{      
+		game.load.image('mainMenu', 'assets/mainMenu.png'); // Load main menu image
+		game.load.image('leaderbrd', 'assets/leaderbrd.png'); // Load leaderboard title image
+	},
+	
+	create: function ()
+	{
+		leaderBoard = game.add.sprite(game.world.centerX, 40, 'leaderbrd'); // Add leaderboard image
+		leaderBoard.anchor.setTo(0.5, 0.5);
 			
-		var leaderButton = game.add.button(game.world.centerX, game.world.centerY, 'leaderboard', getScore, this, 2, 1, 0); // Leadboard button
-		leaderButton.anchor.setTo(0.5, 0.5);
-			
-		var learnButton = game.add.button(game.world.centerX, game.world.centerY + 100, 'learnmore', function() {game.state.start('learn');}, this, 2, 1, 0); // Learn more button
-		learnButton.anchor.setTo(0.5, 0.5);
-    
+		if(localStorage.length > 0)
+		{
+			var localStorageArray = new Array();
+			for (var i = 0; i < localStorage.length; i++)
+			{
+				localStorageArray[i] = Number(localStorage.key(i)); // Put scores in an array so they can be sorted
+			}
+			localStorageArray.sort(function(a,b) { return b - a; }); // Sort scores in decreasing order
+		
+			for (var n = 0; n < localStorageArray.length && n < 9; n++) // Iterate through every initials/score pair
+			{
+				scoresLabel = game.add.text(game.world.centerX, 100 + (n*30), localStorage.getItem(localStorageArray[n]) + "             " + localStorageArray[n]); // Display top 9 initials and score
+				scoresLabel.anchor.setTo(0.5, 0.5);
+				scoresLabel.font = "Press Start 2P";
+				scoresLabel.fill = "#fff"; // White text
+				scoresLabel.fontSize = 12;
+			}
+		}	
+		var menuButton = game.add.button(game.world.centerX, game.world.centerY + 175, 'mainMenu', function() {game.state.start('menu');}, this, 2, 1, 0); // Main menu button
+		menuButton.anchor.setTo(0.5, 0.5);
+	},
+}
+
+var menuState = {
+	
+	preload: function() 
+	{   
+		game.load.image('title', 'assets/ceasethegrease.png'); // Load cease the grease title image
+		game.load.spritesheet('play', 'assets/plays.png', 300, 300); // Load play animation frames	
+		game.load.image('playbutton', 'assets/playbutton.png'); // Load play button image
+	},
+	
+	create: function () 
+	{    
+		game.stage.backgroundColor = 'rgb(1,14,82)'; //Background color blue
+	
+		title = game.add.sprite(game.world.centerX, 100, 'title'); // Add title image
+		title.anchor.setTo(0.5, 0.5);
+		
+		play = this.game.add.sprite(50, 175, 'play'); // Add play button animation at 50,175
+		play.frame = 0; // Default frame is the first frame at position 0
+		
+		play.animations.add('start', [0,1,2], 2, true); // Animate the image
+		
+		play.animations.play('start'); // Play animation
+		
+		var playButton = game.add.button(50+38, 175+113, 'playbutton', function() {game.state.start('story');}, this, 2, 1, 0); // Add play button over play animation to go to story screen
+    },
+};
+
+var scoreState = {
+	
+	preload: function() 
+	{      
+		game.load.image('blankscore', 'assets/scoreblank.png'); // Load blank score image
+		game.load.image('savescore', 'assets/savescore.png'); // Load save score button
+	},
+	
+	create: function () 
+	{    
+		scoreBackground = game.add.sprite(0, 0, 'blankscore'); // Add background image
+		
+		scoreLabel = game.add.text(game.world.centerX, game.world.centerY - 55, score); // Score text
+		scoreLabel.anchor.setTo(0.5, 0.5);
+		scoreLabel.font = "Press Start 2P";
+		scoreLabel.fill = "#fff"; // White text
+		scoreLabel.fontSize = 50;
+		
+		var saveScoreButton = game.add.button(game.world.centerX, game.world.centerY + 190, 'savescore', getScore, this, 2, 1, 0); // Save score button
+		saveScoreButton.anchor.setTo(0.5, 0.5);
+		
 		word = "";
 		prevLetter = "";
 		letter = "";
 	
-		var inputLabel = stateText = game.add.text(game.world.centerX, game.world.centerY, ' ', {font: '30px Arial', fill: '#F2F2F2'}); // Display user input
+		var inputLabel = stateText = game.add.text(game.world.centerX, game.world.centerY, ' '); // Display user input
 		stateText.anchor.setTo(0.5, 0.5);
+		inputLabel.font = "Press Start 2P";
+		inputLabel.fill = "#fff"; // White text
+		inputLabel.fontSize = 30;
 	
 		function getScore () 
 		{
-			mainMenuButton.destroy();
-			leaderButton.destroy();
-			learnButton.destroy();
+			scoreBackground.destroy(); // Delete score background image
+			scoreLabel.destroy(); // Delete score 
+			saveScoreButton.destroy(); // Delete save score button
 			
-			initialsLabel = game.add.text(game.world.centerX, game.world.centerY - 100, 'Please enter your initials then press ENTER', { font: '20px Arial', fill: '#fff' }); // Input initials text
+			initialsLabel = game.add.text(game.world.centerX, game.world.centerY - 100, 'Please enter your initials then press ENTER'); // Input initials text
 			initialsLabel.anchor.setTo(0.5, 0.5);
+			initialsLabel.font = "Press Start 2P";
+			initialsLabel.fill = "#fff"; // White text
+			initialsLabel.fontSize = 9;
 			
 			game.input.keyboard.addCallbacks(self, keyDown, null, null); // Input listener for user's keyboard input 
 			
@@ -197,82 +317,30 @@ var gameOverState = {
 	},
 	
 	update: function () 
-	{
+	{	
 		word = prevLetter + letter; // Used to concatenate both initials and display it on the screen
         stateText.text = word;
         stateText.visible = true;
 	},
 };
 
-var leaderboardState = {
-	
-	preload: function() 
-	{      
-		game.load.image('mainmenu', 'assets/mainmenu.png'); // Load main menu image
-	},
-	
-	create: function ()
-	{
-		leaderboardLabel = game.add.text(game.world.centerX, game.world.centerY - 200, 'Leaderboard', { font: '30px Arial', fill: '#fff' }); // Leaderboard text
-		leaderboardLabel.anchor.setTo(0.5, 0.5);
-			
-		if(localStorage.length > 0)
-		{
-			var localStorageArray = new Array();
-			for (var i = 0; i < localStorage.length; i++)
-			{
-				localStorageArray[i] = Number(localStorage.key(i)); // Put scores in an array so they can be sorted
-			}
-			localStorageArray.sort(function(a,b) { return b - a; }); // Sort scores in decreasing order
-		
-			for (var n = 0; n < localStorageArray.length && n < 9; n++) // Iterate through every initials/score pair
-			{
-				scoreLabel = game.add.text(game.world.centerX, 100 + (n*30), localStorage.getItem(localStorageArray[n]) + "             " + localStorageArray[n], { font: '20px Arial', fill: '#fff' }); // Display top 9 initials and score
-				scoreLabel.anchor.setTo(0.5, 0.5);
-			}
-		}	
-		var mainMenuButton = game.add.button(game.world.centerX, game.world.centerY + 175, 'mainmenu', function() {game.state.start('menu');}, this, 2, 1, 0); // Main menu button
-		mainMenuButton.anchor.setTo(0.5, 0.5);
-	},
-}
-
-var menuState = {
-	
-	preload: function() 
-	{      
-		game.load.image('instructions', 'assets/instructions.png'); // Load instructions image
-		game.load.image('leaderboard', 'assets/leaderboard.png'); // Load leader board image
-		game.load.image('learnmore', 'assets/learnmore.png'); // Load learn more image
-		game.load.image('play', 'assets/play.png'); // Load play image
-	},
-	
-	create: function () 
-	{    
-		game.stage.backgroundColor = '#71c5cf'; //Background color blue
-	
-		var menuLabel = game.add.text(game.world.centerX, game.world.centerY - 200, 'The Cease the Grease Game', {font: '30px Arial', fill: '#F2F2F2'}); // Main menu text
-		menuLabel.anchor.setTo(0.5, 0.5);
-		
-		var playButton = game.add.button(game.world.centerX, game.world.centerY - 125, 'play', function() {game.state.start('story');}, this, 2, 1, 0); // Play button
-		playButton.anchor.setTo(0.5, 0.5);
-		
-		var instructionsButton = game.add.button(game.world.centerX, game.world.centerY - 25, 'instructions', function() {game.state.start('instructions');}, this, 2, 1, 0); // Instructions button
-		instructionsButton.anchor.setTo(0.5, 0.5);
-			
-		var leaderButton = game.add.button(game.world.centerX, game.world.centerY + 75, 'leaderboard', function() {game.state.start('leader');}, this, 2, 1, 0); // Leadboard button
-		leaderButton.anchor.setTo(0.5, 0.5);
-			
-		var learnButton = game.add.button(game.world.centerX, game.world.centerY + 175, 'learnmore', function() {game.state.start('learn');}, this, 2, 1, 0); // Learn more button
-		learnButton.anchor.setTo(0.5, 0.5);
-    },
-};
-
 var storyState = {
+	
+	preload: function() 
+	{      
+		game.load.image('letsgo', 'assets/letsgo.png'); // Load let's go droplet image
+	},
 	
 	create: function () 
 	{    	
-		var storyLabel = game.add.text(game.world.centerX, game.world.centerY, 'Help Drippy reach the ocean! \nTo start game click anywhere', {font: '20px Arial', fill: '#F2F2F2'}); // Story text
+		var storyLabel = game.add.text(game.world.centerX, game.world.centerY - 150, 'Help Drippy reach the ocean! \nTo start game click anywhere'); // Story text
         storyLabel.anchor.setTo(0.5, 0.5);
+		storyLabel.font = "Press Start 2P";
+		storyLabel.fill = "#fff"; // White text
+		storyLabel.fontSize = 12;
+		
+		letsGo = game.add.sprite(game.world.centerX, game.world.centerY + 50, 'letsgo'); // Add let's go droplet image
+		letsGo.anchor.setTo(0.5, 0.5);
 		
 		game.input.onDown.add(function() {game.state.start('main');}, self); // Input listener to start game on mouse click
     },
@@ -317,14 +385,16 @@ var game = new Phaser.Game(400, 490);
 
 //localStorage.clear();
 
+var timer = 0;
 var prevLetter = " ";
 var letter = " ";
 var initials = " ";
 var score = 0;
 
 game.state.add('main', mainState); 
-game.state.add('end', gameOverState);
+game.state.add('over', gameOverState);
 game.state.add('menu', menuState);
+game.state.add('score', scoreState);
 game.state.add('leader', leaderboardState);
 game.state.add('learn', learnMoreState);
 game.state.add('story', storyState);
