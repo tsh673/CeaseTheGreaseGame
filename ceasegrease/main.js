@@ -27,6 +27,7 @@ var mainState = {
 		}, this);
 
 		game.input.onDown.add(unpause, self); // Input listener to unpause game when user clicks outside of the menu options
+		game.input.onDown.add(this.jump, this); //Input listener to move drippy with mouse click/tap (on mobile)
 		
 		function unpause(event) // Unpause game
 		{
@@ -71,6 +72,9 @@ var mainState = {
 
 		var spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR); // Jump when spacebar is pressed
 		spaceKey.onDown.add(this.jump, this);
+		
+		var mouseClick = game.input;
+		
 		
 		this.oils = game.add.group(); 
 		
