@@ -92,13 +92,18 @@ var mainState = {
 
     update: function() // This function is called 60 times per second
 	{
-		if (this.droplet.y < 0 || this.droplet.y > 490)
+        if (this.droplet.y < 0 ) //resets drippy's upper bound to 0
+        {
+            this.droplet.y = 0;
+        }
+        else if (this.droplet.y > 490)
 		{
+//            this.droplet.y = 490; //resets drippy's lower bound to max
 			mainMusic.stop();
 			game.state.start('over'); // If the droplet is out of the screen, end the game
 		}
 		
-		game.physics.arcade.overlap(this.droplet, this.oils, this.endGame, null, this); // If the droplet and oil overlap, end the game
+		game.physics.arcade.collide(this.droplet, this.oils, this.endGame, null, this); // If the droplet and oil overlap, end the game
     },
 	
 	jump: function() // Make the droplet jump 
@@ -112,7 +117,7 @@ var mainState = {
 		game.state.start('over');
 	},
 	
-	addOneOil: function(x, y) 
+	addOneOil: function(x, y) //need to speed up oil spawn or increase oils on screen
 	{
 		var oil = game.add.sprite(x, y, 'oil'); // Display oil at x, y
 
@@ -120,7 +125,7 @@ var mainState = {
 
 		game.physics.arcade.enable(oil);
 		
-		oil.body.velocity.x = -200; // Add velocity to the oil spill to make it move left
+		oil.body.velocity.x = -200 - (5*score); // Add velocity to the oil spill to make it move left
 
 		oil.checkWorldBounds = true;
 		oil.outOfBoundsKill = true; // Kill the oil when its out of bounds
@@ -128,14 +133,19 @@ var mainState = {
 	
 	addRowOfOils: function() 
 	{
-		var hole = Math.floor(Math.random() * 5) + 1; // Randomly choose a # between 1-5 for the hole position
-
+		var hole = Math.floor(Math.random() * 8) + 0; // Randomly choose a # between 0-7 for the hole position
+//0-8 should cover full y value of bound
 		for (var i = 0; i < 8; i++)
 			if (i == hole) 
 				this.addOneOil(400, i * 60 + 10);
+<<<<<<< Updated upstream
 				
 		score += 1;
 		scoreLabel.text = score;  
+=======
+        score += 1;
+		labelScore.text = score;
+>>>>>>> Stashed changes
 	},
 };
 
