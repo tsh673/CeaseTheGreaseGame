@@ -138,14 +138,9 @@ var mainState = {
 		for (var i = 0; i < 8; i++)
 			if (i == hole) 
 				this.addOneOil(400, i * 60 + 10);
-<<<<<<< Updated upstream
-				
+			
 		score += 1;
 		scoreLabel.text = score;  
-=======
-        score += 1;
-		labelScore.text = score;
->>>>>>> Stashed changes
 	},
 };
 
