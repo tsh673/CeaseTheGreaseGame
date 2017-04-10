@@ -52,6 +52,7 @@ var mainState = {
 					else
 					{
 						game.paused = false; // Unpause the game
+						mainMusic.stop();
 						game.state.start('menu'); // Go to main menu
 					}		
 				}
@@ -103,7 +104,6 @@ var mainState = {
 		else if (this.deadDrop.y > 490)
 		{
 			this.deadDrop.destroy(); 
-			mainMusic.stop();
 			game.state.start('over'); // If the dead droplet is out of the screen, end the game
 		}
         else if (this.droplet.y > 490)
@@ -125,6 +125,8 @@ var mainState = {
 	endGame: function() // End the game
 	{
 		this.droplet.destroy(); // Remove droplet image 
+		
+		mainMusic.stop();
 		
 		this.deadDrop = game.add.sprite(this.droplet.x, this.droplet.y, 'dead'); // Replace droplet w/ dead droplet
 		game.physics.arcade.enable(this.deadDrop); // Add physics to dead droplet
