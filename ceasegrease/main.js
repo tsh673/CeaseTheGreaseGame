@@ -9,8 +9,9 @@ var mainState = {
 		game.load.image('background', 'assets/background7.png'); // Load background image
 		game.load.image('oil', 'assets/oil.png'); // Load oil image
 		game.load.image('pausemenu', 'assets/pausemenu.png'); // Load pause menu image
+		game.load.image('dead', 'assets/dead.png'); // Load dead droplet image
 		game.load.audio('main', ['assets/main_music.mp3', 'assets/main_music.ogg']); // Load main game music
-    },
+	},
 
     create: function() 
 	{   
@@ -57,6 +58,10 @@ var mainState = {
 			}
 		};
 		
+		this.deadDrop = game.add.sprite(0, 0, 'dead'); // Create dead droplet sprite for use when collision occurs
+		game.physics.arcade.enable(this.deadDrop); // Add physics to dead droplet
+		this.deadDrop.visible = !this.deadDrop.visible; // Make dead droplet invisible until collision occurs
+				
 		game.physics.startSystem(Phaser.Physics.ARCADE);
 
 		this.droplet = game.add.sprite(100, 245, 'droplet'); // Add droplet sprite at 50,175
@@ -74,7 +79,6 @@ var mainState = {
 		spaceKey.onDown.add(this.jump, this);
 		
 		var mouseClick = game.input;
-		
 		
 		this.oils = game.add.group(); 
 		
@@ -96,9 +100,16 @@ var mainState = {
         {
             this.droplet.y = 0;
         }
+		else if (this.deadDrop.y > 490)
+		{
+			this.deadDrop.destroy(); 
+			mainMusic.stop();
+			game.state.start('over'); // If the dead droplet is out of the screen, end the game
+		}
         else if (this.droplet.y > 490)
 		{
-//            this.droplet.y = 490; //resets drippy's lower bound to max
+			//this.droplet.y = 490; //resets drippy's lower bound to max
+			this.droplet.destroy(); 
 			mainMusic.stop();
 			game.state.start('over'); // If the droplet is out of the screen, end the game
 		}
@@ -113,8 +124,11 @@ var mainState = {
 
 	endGame: function() // End the game
 	{
-		mainMusic.stop();
-		game.state.start('over');
+		this.droplet.destroy(); // Remove droplet image 
+		
+		this.deadDrop = game.add.sprite(this.droplet.x, this.droplet.y, 'dead'); // Replace droplet w/ dead droplet
+		game.physics.arcade.enable(this.deadDrop); // Add physics to dead droplet
+		this.deadDrop.body.gravity.y = 500; // Makes dead droplet fall
 	},
 	
 	addOneOil: function(x, y) //need to speed up oil spawn or increase oils on screen
@@ -134,7 +148,8 @@ var mainState = {
 	addRowOfOils: function() 
 	{
 		var hole = Math.floor(Math.random() * 8) + 0; // Randomly choose a # between 0-7 for the hole position
-//0-8 should cover full y value of bound
+		
+		//0-8 should cover full y value of bound
 		for (var i = 0; i < 8; i++)
 			if (i == hole) 
 				this.addOneOil(400, i * 60 + 10);
@@ -158,14 +173,7 @@ var gameOverState = {
 	
 		gameOver = game.add.sprite(game.world.centerX, 245, 'gameover'); // Add game over image
 		gameOver.anchor.setTo(0.5, 0.5);
-	/*	
-		this.deadDrop = game.add.sprite(game.world.centerX, 0, 'dead'); // Add dead droplet image
-		this.deadDrop.anchor.setTo(0.5, 0.5);
 	
-		game.physics.arcade.enable(this.deadDrop); // Add physics to dead droplet
-		
-		this.deadDrop.body.gravity.y = 500; // Makes dead droplet fall 
-	*/	
 		timer = 0;
 		
 		gameOverLabel = game.add.text(game.world.centerX, game.world.centerY + 200, 'Click anywhere to continue'); // Click anywhere to continue text
@@ -179,13 +187,6 @@ var gameOverState = {
 	
 	update: function () 
 	{
-	/*
-		if (this.deadDrop.y >= 200)
-		{
-			console.log("hey");
-			this.deadDrop.body.gravity.y = 0;
-		}
-	*/
 		//Used to make text blink
 		timer += game.time.elapsed;
 		if (timer >= 500)
@@ -342,55 +343,38 @@ var storyState = {
 	
 	create: function () 
 	{    	
-		var storyLabel = game.add.text(game.world.centerX, game.world.centerY - 150, 'Help Drippy reach the ocean! \nTo start game click anywhere'); // Story text
+		var storyLabel = game.add.text(game.world.centerX, game.world.centerY - 200, 'Help Drippy reach the ocean!'); // Story text
         storyLabel.anchor.setTo(0.5, 0.5);
 		storyLabel.font = "Press Start 2P";
 		storyLabel.fill = "#fff"; // White text
 		storyLabel.fontSize = 12;
 		
-		letsGo = game.add.sprite(game.world.centerX, game.world.centerY + 50, 'letsgo'); // Add let's go droplet image
+		var instructionsLabel = game.add.text(game.world.centerX, game.world.centerY - 175, 'Press SPACEBAR to jump'); // Instructions text
+        instructionsLabel.anchor.setTo(0.5, 0.5);
+		instructionsLabel.font = "Press Start 2P";
+		instructionsLabel.fill = "#fff"; // White text
+		instructionsLabel.fontSize = 12;
+		
+		var instLabel = game.add.text(game.world.centerX, game.world.centerY - 150, 'Press ENTER to pause the game'); // Instructions text
+        instLabel.anchor.setTo(0.5, 0.5);
+		instLabel.font = "Press Start 2P";
+		instLabel.fill = "#fff"; // White text
+		instLabel.fontSize = 12;
+		
+		letsGo = game.add.sprite(game.world.centerX, game.world.centerY + 25, 'letsgo'); // Add let's go droplet image
 		letsGo.anchor.setTo(0.5, 0.5);
+		
+		var storyLabel = game.add.text(game.world.centerX, game.world.centerY + 200, 'Click anywhere to start game'); // Story text
+        storyLabel.anchor.setTo(0.5, 0.5);
+		storyLabel.font = "Press Start 2P";
+		storyLabel.fill = "#fff"; // White text
+		storyLabel.fontSize = 12;
 		
 		game.input.onDown.add(function() {game.state.start('main');}, self); // Input listener to start game on mouse click
     },
 };
 
-var learnMoreState = {
-	
-	preload: function() 
-	{      
-		game.load.image('mainmenu', 'assets/mainmenu.png'); // Load main menu image
-	},
-	
-	create: function () 
-	{    
-		var learnMoreLabel = game.add.text(game.world.centerX, game.world.centerY - 200, 'About the Cease the Grease Campaign', {font: '20px Arial', fill: '#F2F2F2'}); // Learn more text
-		learnMoreLabel.anchor.setTo(0.5, 0.5);
-		
-		var mainMenuButton = game.add.button(game.world.centerX, game.world.centerY + 175, 'mainmenu', function() {game.state.start('menu');}, this, 2, 1, 0); // Main menu button
-		mainMenuButton.anchor.setTo(0.5, 0.5);
-    },
-};
-
-var instructionsState = {
-	
-	preload: function() 
-	{      
-		game.load.image('mainmenu', 'assets/mainmenu.png'); // Load main menu image
-	},
-	
-	create: function () 
-	{    
-		var instructionsLabel = game.add.text(game.world.centerX, game.world.centerY - 200, 'How to Play', {font: '30px Arial', fill: '#F2F2F2'}); // Instructions text
-		instructionsLabel.anchor.setTo(0.5, 0.5);
-		
-		var mainMenuButton = game.add.button(game.world.centerX, game.world.centerY + 175, 'mainmenu', function() {game.state.start('menu');}, this, 2, 1, 0); // Main menu button
-		mainMenuButton.anchor.setTo(0.5, 0.5);
-    },
-};
-
-// Create a 400, 490 new Phaser game
-var game = new Phaser.Game(400, 490);
+var game = new Phaser.Game(400, 490); // Create a 400, 490 new Phaser game
 
 //localStorage.clear();
 
@@ -405,9 +389,6 @@ game.state.add('over', gameOverState);
 game.state.add('menu', menuState);
 game.state.add('score', scoreState);
 game.state.add('leader', leaderboardState);
-game.state.add('learn', learnMoreState);
 game.state.add('story', storyState);
-game.state.add('instructions', instructionsState);
 
-// Begin the game at the main menu
-game.state.start('menu');
+game.state.start('menu'); // Begin the game at the main menu
