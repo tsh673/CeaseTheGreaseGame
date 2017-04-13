@@ -345,16 +345,43 @@ var scoreState = {
     {
         game.load.image('blankscore', 'assets/scoreblank.png'); // Load blank score image
         game.load.image('savescore', 'assets/savescore.png'); // Load save score button
+		game.load.image('q', 'assets/q.png'); // Load alphabet
+		game.load.image('w', 'assets/w.png'); // Load alphabet
+		game.load.image('e', 'assets/e.png'); // Load alphabet
+		game.load.image('r', 'assets/r.png'); // Load alphabet
+		game.load.image('t', 'assets/t.png'); // Load alphabet
+		game.load.image('y', 'assets/y.png'); // Load alphabet
+		game.load.image('u', 'assets/u.png'); // Load alphabet
+		game.load.image('i', 'assets/i.png'); // Load alphabet
+		game.load.image('o', 'assets/o.png'); // Load alphabet
+		game.load.image('p', 'assets/p.png'); // Load alphabet
+		game.load.image('a', 'assets/a.png'); // Load alphabet
+		game.load.image('s', 'assets/s.png'); // Load alphabet
+		game.load.image('d', 'assets/d.png'); // Load alphabet
+		game.load.image('f', 'assets/f.png'); // Load alphabet
+		game.load.image('g', 'assets/g.png'); // Load alphabet
+		game.load.image('h', 'assets/h.png'); // Load alphabet
+		game.load.image('j', 'assets/j.png'); // Load alphabet
+		game.load.image('k', 'assets/k.png'); // Load alphabet
+		game.load.image('l', 'assets/l.png'); // Load alphabet
+		game.load.image('z', 'assets/z.png'); // Load alphabet
+		game.load.image('x', 'assets/x.png'); // Load alphabet
+		game.load.image('c', 'assets/c.png'); // Load alphabet
+		game.load.image('v', 'assets/v.png'); // Load alphabet
+		game.load.image('b', 'assets/b.png'); // Load alphabet
+		game.load.image('n', 'assets/n.png'); // Load alphabet
+		game.load.image('m', 'assets/m.png'); // Load alphabet
+		game.load.image('enter', 'assets/enter.png'); // Load enter button
     },
     create: function ()
     {
-        this.scoreBackground = game.add.sprite(0, 0, 'blankscore'); // Add background image
+        scoreBackground = game.add.sprite(0, 0, 'blankscore'); // Add background image
 
-        this.scoreLabel = game.add.text(game.world.centerX, game.world.centerY - 55, score); // Score text
-        this.scoreLabel.anchor.setTo(0.5, 0.5);
-        this.scoreLabel.font = "Press Start 2P";
-        this.scoreLabel.fill = "#fff"; // White text
-        this.scoreLabel.fontSize = 50;
+        scoreLabel = game.add.text(game.world.centerX, game.world.centerY - 55, score); // Score text
+        scoreLabel.anchor.setTo(0.5, 0.5);
+        scoreLabel.font = "Press Start 2P";
+        scoreLabel.fill = "#fff"; // White text
+        scoreLabel.fontSize = 50;
 
         var saveScoreButton = game.add.button(game.world.centerX, game.world.centerY + 190, 'savescore', getScore, this, 2, 1, 0); // Save score button
         saveScoreButton.anchor.setTo(0.5, 0.5);
@@ -363,7 +390,7 @@ var scoreState = {
         prevLetter = "";
         letter = "";
 
-        var inputLabel = stateText = game.add.text(game.world.centerX, game.world.centerY, ' '); // Display user input
+        var inputLabel = stateText = game.add.text(game.world.centerX, game.world.centerY - 50, ' '); // Display user input
         stateText.anchor.setTo(0.5, 0.5);
         inputLabel.font = "Press Start 2P";
         inputLabel.fill = "#fff"; // White text
@@ -375,33 +402,72 @@ var scoreState = {
             scoreLabel.destroy(); // Delete score 
             saveScoreButton.destroy(); // Delete save score button
 
-            initialsLabel = game.add.text(game.world.centerX, game.world.centerY - 100, 'Please enter your initials then press ENTER'); // Input initials text
+            initialsLabel = game.add.text(game.world.centerX, game.world.centerY - 200, 'Please enter your initials'); // Input initials text
             initialsLabel.anchor.setTo(0.5, 0.5);
             initialsLabel.font = "Press Start 2P";
-            initialsLabel.fill = "#fff"; // White text
-            initialsLabel.fontSize = 9;
+            initialsLabel.fill = "rgb(182,145,35)"; // Tan text
+            initialsLabel.fontSize = 12;
 
-            game.input.keyboard.addCallbacks(self, keyDown, null, null); // Input listener for user's keyboard input 
-
-            function keyDown(evt)
-            {
-                if (evt.which < "A".charCodeAt(0) || evt.which > "Z".charCodeAt(0))
-                    return; // Skip it unless it's a-z.
-
-                prevLetter = letter; // Save previous letter
-
-                letter = String.fromCharCode(evt.which) + "."; // Add period for initials format ex: t.h.
-
-                if (!evt.shiftKey)
-                    letter = letter.toUpperCase();
-            }
-
-            this.enter2 = game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
-            this.enter2.onDown.add(function () { // When the enter key is pressed
-                localStorage.setItem(score.toString(), word); // Store initials and score for leaderboard
-
-                game.state.start('leader');	// Go to leaderboard
-            }, this);
+			enterLabel = game.add.text(game.world.centerX, game.world.centerY - 175, 'Press ENTER to save score'); // Enter text
+            enterLabel.anchor.setTo(0.5, 0.5);
+            enterLabel.font = "Press Start 2P";
+            enterLabel.fill = "rgb(182,145,35)"; // Tan text
+            enterLabel.fontSize = 12;
+			
+			var qButton = game.add.button(5, game.world.centerY + 60, 'q', function () {
+            prevLetter = letter; letter = "Q.";}, this, 2, 1, 0); 
+			var wButton = game.add.button(44, game.world.centerY + 60, 'w', function () {
+            prevLetter = letter; letter = "W.";}, this, 2, 1, 0); // Keyboard button
+			var eButton = game.add.button(83, game.world.centerY + 60, 'e', function () {
+            prevLetter = letter; letter = "E.";}, this, 2, 1, 0); // Keyboard button
+			var rButton = game.add.button(122, game.world.centerY + 60, 'r', function () {
+            prevLetter = letter; letter = "R.";}, this, 2, 1, 0); // Keyboard button
+			var tButton = game.add.button(161, game.world.centerY + 60, 't', function () {
+            prevLetter = letter; letter = "T.";}, this, 2, 1, 0); // Keyboard button
+			var yButton = game.add.button(200, game.world.centerY + 60, 'y', function () {
+            prevLetter = letter; letter = "Y.";}, this, 2, 1, 0); // Keyboard button
+			var uButton = game.add.button(239, game.world.centerY + 60, 'u', function () {
+            prevLetter = letter; letter = "U.";}, this, 2, 1, 0); // Keyboard button
+			var iButton = game.add.button(278, game.world.centerY + 60, 'i', function () {
+            prevLetter = letter; letter = "I.";}, this, 2, 1, 0); // Keyboard button
+			var oButton = game.add.button(317, game.world.centerY + 60, 'o', function () {
+            prevLetter = letter; letter = "O.";}, this, 2, 1, 0); // Keyboard button
+			var pButton = game.add.button(356, game.world.centerY + 60, 'p', function () {
+            prevLetter = letter; letter = "P.";}, this, 2, 1, 0); // Keyboard button
+			var aButton = game.add.button(22, game.world.centerY + 100, 'a', function () {
+            prevLetter = letter; letter = "A.";}, this, 2, 1, 0); // Keyboard button
+			var sButton = game.add.button(61, game.world.centerY + 100, 's', function () {
+            prevLetter = letter; letter = "S.";}, this, 2, 1, 0); // Keyboard button
+			var dButton = game.add.button(100, game.world.centerY + 100, 'd', function () {
+            prevLetter = letter; letter = "D.";}, this, 2, 1, 0); // Keyboard button
+			var fButton = game.add.button(139, game.world.centerY + 100, 'f', function () {
+            prevLetter = letter; letter = "F.";}, this, 2, 1, 0); // Keyboard button
+			var gButton = game.add.button(178, game.world.centerY + 100, 'g', function () {
+            prevLetter = letter; letter = "G.";}, this, 2, 1, 0); // Keyboard button
+			var hButton = game.add.button(217, game.world.centerY + 100, 'h', function () {
+            prevLetter = letter; letter = "H.";}, this, 2, 1, 0); // Keyboard button
+			var jButton = game.add.button(256, game.world.centerY + 100, 'j', function () {
+            prevLetter = letter; letter = "J.";}, this, 2, 1, 0); // Keyboard button
+			var kButton = game.add.button(295, game.world.centerY + 100, 'k', function () {
+            prevLetter = letter; letter = "K.";}, this, 2, 1, 0); // Keyboard button
+			var lButton = game.add.button(334, game.world.centerY + 100, 'l', function () {
+            prevLetter = letter; letter = "L.";}, this, 2, 1, 0); // Keyboard button
+			var zButton = game.add.button(63, game.world.centerY + 140, 'z', function () {
+            prevLetter = letter; letter = "Z.";}, this, 2, 1, 0); // Keyboard button
+			var xButton = game.add.button(102, game.world.centerY + 140, 'x', function () {
+            prevLetter = letter; letter = "X.";}, this, 2, 1, 0); // Keyboard button
+			var cButton = game.add.button(141, game.world.centerY + 140, 'c', function () {
+            prevLetter = letter; letter = "C.";}, this, 2, 1, 0); // Keyboard button
+			var vButton = game.add.button(180, game.world.centerY + 140, 'v', function () {
+            prevLetter = letter; letter = "V.";}, this, 2, 1, 0); // Keyboard button
+			var bButton = game.add.button(219, game.world.centerY + 140, 'b', function () {
+            prevLetter = letter; letter = "B.";}, this, 2, 1, 0); // Keyboard button
+			var nButton = game.add.button(258, game.world.centerY + 140, 'n', function () {
+            prevLetter = letter; letter = "N.";}, this, 2, 1, 0); // Keyboard button
+			var mButton = game.add.button(297, game.world.centerY + 140, 'm', function () {
+            prevLetter = letter; letter = "M.";}, this, 2, 1, 0); // Keyboard button
+			var entButton = game.add.button(143, game.world.centerY + 180, 'enter', function () {
+            localStorage.setItem(score.toString(), word); game.state.start('leader');}, this, 2, 1, 0); // Enter button
         }
     },
     update: function ()
