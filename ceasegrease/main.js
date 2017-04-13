@@ -1,4 +1,4 @@
-/* global system */
+/* global system, Phaser, self */
 
 // Property of Texas A&M Cease the Grease CSCE 482 Taylor Harris, Victor Martinez, Chance Eckert 
 
@@ -46,9 +46,9 @@ var mainState = {
 
                     var selection = Math.floor(x / 90) + 3 * Math.floor(y / 90); // Calculate the choice
 
-                    if (selection == 0 || selection == 1 || selection == 2) // Display the choice
+                    if (selection === 0 || selection === 1 || selection === 2) // Display the choice
                     {
-                        pauseMenu.destroy(); // Remove pause menu image
+                        this.pauseMenu.destroy(); // Remove pause menu image
                         game.paused = false; // Unpause the game
                     } else
                     {
@@ -83,6 +83,7 @@ var mainState = {
         var mouseClick = game.input;
 
         this.oils = game.add.group();
+        this.oils.hasScored = false;
 
         this.timer = game.time.events.loop(1500, this.addRowOfOils, this);
 
@@ -113,17 +114,16 @@ var mainState = {
             this.deadDrop.destroy();
             game.state.start('over'); // If the dead droplet is out of the screen, end the game
         }
-//        game.physics.arcade.collide(this.droplet, this.oils, this.endGame, null, this); // If the droplet and oil overlap, end the game
+        game.physics.arcade.collide(this.droplet, this.oils, this.endGame, null, this); // If the droplet and oil overlap, end the game
+
+        this.oils.forEach(function(oils) {
+            this.checkScore(oils);
+            this.game.physics.arcade.collide(this.droplet, this.oils, this.endGame, null, this);
+        }, this);
 //        game.physics.arcade.collide(this.oils, this.droplet, this.endGame, null, this);
 
     },
-    checkScore: function (oils) {
-        if (oils.exists && !oils.hasScored && this.oil.world.x <= this.droplet.world.x) {
-            oils.hasScored = true;
-            this.score++;
-            this.scoreText.setText(this.score.toString());
-        }
-    },
+    
     jump: function () // Make the droplet jump 
     {
         this.droplet.body.velocity.y = -350; // Add a vertical velocity to the droplet
@@ -135,7 +135,6 @@ var mainState = {
         mainMusic.stop();
 
         this.deadDrop.visible = !this.deadDrop.visible;// Replace droplet w/ dead droplet
-//        game.physics.arcade.enable(this.deadDrop); // Add physics to dead droplet
         this.deadDrop.body.gravity.y = 500; // Makes dead droplet fall
 
 
@@ -155,20 +154,89 @@ var mainState = {
     },
     addRowOfOils: function ()
     {
-        var hole = Math.floor(Math.random() * 8) + 0; // Randomly choose a # between 0-7 for the hole position
+        var min = 0;
+        var max = 8;
 
+        var hole = Math.floor(Math.random() * (max - min + 1)) + min;
+        var frequency = Math.floor(Math.random() * (score - 1 + 1)) + 1;
+        // Randomly choose a # between 0-8 for the hole position
         //0-8 should cover full y value of bound
-        for (var i = 0; i < 8; i++) {
-            if (i === hole) {
-                this.addOneOil(400, i * 60 + 10);
-            }
+        //here on begins the oil generator
+        for (var i = 0; i < frequency; i++) {
+                for(var j = 0; j < 8; j++){
+                    switch(score){
+                        case (score<10):
+                            if (j !== hole && j !== (hole+1) && j !== (hole+2) && j !== (hole+3) && j!== (hole+4) && j !== (hole+5) && j !== (hole+6) && j !== (hole+7)){
+                                this.addOneOil(400, j * 60 + 10);
+                            }
+                            break;
+                        case (score>10 && score<20):
+                            if (j !== hole && j !== (hole+1) && j !== (hole+2) && j !== (hole+3) && j!== (hole+4) && j !== (hole+5) && j !== (hole+6)){
+                                this.addOneOil(400, j * 60 + 10);
+                            }
+                            break;
+                        case (score>20 && score<30):
+                            if (j !== hole && j !== (hole+1) && j !== (hole+2) && j !== (hole+3) && j!== (hole+4) && j !== (hole+5)){
+                                this.addOneOil(400, j * 60 + 10);
+                            }
+                            break;
+                        case (score>30 && score<40):
+                            if (j !== hole && j !== (hole+1) && j !== (hole+2) && j !== (hole+3) && j!== (hole+4)){
+                                this.addOneOil(400, j * 60 + 10);
+                            }
+                            break;
+                        case (score>40 && score<50):
+                            if (j !== hole && j !== (hole+1) && j !== (hole+2) && j !== (hole+3)){
+                                this.addOneOil(400, j * 60 + 10);
+                            }
+                            break;
+                        case (score>50 && score<60):
+                            if (j !== hole && j !== (hole+1) && j !== (hole+2)){
+                                this.addOneOil(400, j * 60 + 10);
+                            }
+                            break;
+                        case (score>60 && score<70):
+                            if(j !== hole && j !== (hole+1)){
+                                this.addOneOil(400, j * 60 + 10);
+                        
+                            }
+                            break;
+                        case (score>70):
+                            if(j !== hole){
+                                this.addOneOil(400, j * 60 + 10);
+                        
+                            }
+                            break;
+                        default:
+                            if(score<70){
+                                if (j === hole){
+                                    this.addOneOil(400, j * 60 + 10);
+                                }
+                            }
+                            if (score >70){
+                                if(j !== hole){
+                                    this.addOneOil(400, j * 60 + 10);
+                        
+                                }
+                                
+                            }
+                    }
+                    
+                }
+            
+            
         }
-//        score += 1;
-//        scoreLabel.text = score;
-        this.oils.forEach(function (oils) {
-            this.checkScore(oils);
-            this.game.physics.arcade.collide(this.droplet, oils, this.deathHandler, null, this);
-        }, this);
+       
+    },
+//  if (oils.exists && !oils.hasScored && oils.oil.world.centerX <= this.droplet.world.x ) {
+    //when working should add to score when called
+    checkScore: function (oils) {
+        if (oils.exists && !oils.hasScored && oils.world.x < 100 ) {
+                    oils.hasScored = true;
+                    score += 1;
+                    this.scoreLabel.text = score;
+                    
+        }
     }
 };
 
@@ -282,13 +350,13 @@ var scoreState = {
     },
     create: function ()
     {
-        scoreBackground = game.add.sprite(0, 0, 'blankscore'); // Add background image
+        this.scoreBackground = game.add.sprite(0, 0, 'blankscore'); // Add background image
 
-        scoreLabel = game.add.text(game.world.centerX, game.world.centerY - 55, score); // Score text
-        scoreLabel.anchor.setTo(0.5, 0.5);
-        scoreLabel.font = "Press Start 2P";
-        scoreLabel.fill = "#fff"; // White text
-        scoreLabel.fontSize = 50;
+        this.scoreLabel = game.add.text(game.world.centerX, game.world.centerY - 55, score); // Score text
+        this.scoreLabel.anchor.setTo(0.5, 0.5);
+        this.scoreLabel.font = "Press Start 2P";
+        this.scoreLabel.fill = "#fff"; // White text
+        this.scoreLabel.fontSize = 50;
 
         var saveScoreButton = game.add.button(game.world.centerX, game.world.centerY + 190, 'savescore', getScore, this, 2, 1, 0); // Save score button
         saveScoreButton.anchor.setTo(0.5, 0.5);
