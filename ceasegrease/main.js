@@ -397,7 +397,7 @@ var scoreState = {
 			return false;
 		}, this);     
         
-        this.scoreBackground = game.add.sprite(0, 0, 'blankscore'); // Add background image
+        scoreBackground = game.add.sprite(0, 0, 'blankscore'); // Add background image
 
         scoreLabel = game.add.text(game.world.centerX, game.world.centerY - 55, score); // Score text
         scoreLabel.anchor.setTo(0.5, 0.5);
@@ -423,6 +423,8 @@ var scoreState = {
             scoreBackground.destroy(); // Delete score background image
             scoreLabel.destroy(); // Delete score 
             saveScoreButton.destroy(); // Delete save score button
+			twitterButton.destroy(); // Delete social media buttons
+			facebookButton.destroy(); // Delete social media buttons
 
             initialsLabel = game.add.text(game.world.centerX, game.world.centerY - 200, 'Please enter your initials'); // Input initials text
             initialsLabel.anchor.setTo(0.5, 0.5);
