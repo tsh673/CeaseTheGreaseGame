@@ -348,6 +348,30 @@ var scoreState = {
     },
     create: function ()
     {
+        
+        var facebookButton = this.add.graphics(0, 0);
+		facebookButton.lineStyle(2, 0x0000FF, 0.5);
+		facebookButton.beginFill(0xFF8080, 1);
+ 		facebookButton.drawRect(game.world.centerX - 125, game.world.centerY + 30, 100, 100);            
+		facebookButton.endFill();
+		facebookButton.inputEnabled = true;            
+		facebookButton.events.onInputDown.add(function () {                
+			var fbpopup = window.open("https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fpeople.tamu.edu%2F%7Evalexis22009%2Fceasegrease%2F&amp", "pop", "width=600, height=400, scrollbars=no");
+			return false;
+		}, this);
+		
+		var twitterButton = this.add.graphics(0, 0);
+		twitterButton.lineStyle(2, 0x0000FF, 0.5);
+		twitterButton.beginFill(0xFF8080, 1);
+ 		twitterButton.drawRect(game.world.centerX + 25, game.world.centerY + 30, 100, 100);            
+		twitterButton.endFill();
+		twitterButton.inputEnabled = true;            
+		twitterButton.events.onInputDown.add(function () {                
+			var twpopup = window.open("https://twitter.com/intent/tweet?text=Help Trippy Out! http://people.tamu.edu/~valexis22009/ceasegrease/", "pop", "width=600, height=400, scrollbars=no");
+			return false;
+		}, this);
+        
+        
         this.scoreBackground = game.add.sprite(0, 0, 'blankscore'); // Add background image
 
         this.scoreLabel = game.add.text(game.world.centerX, game.world.centerY - 55, score); // Score text
