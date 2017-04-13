@@ -9,16 +9,14 @@ var mainState = {
     {
         game.load.spritesheet('droplet', 'assets/droppp.png', 37, 62); // Load droplet animation frames	
         game.load.image('background', 'assets/background7.png'); // Load background image
-        game.load.image('oil', 'assets/oil.png'); // Load oil image
+        game.load.image('oil', 'assets/grease.png'); // Load oil image
         game.load.image('pausemenu', 'assets/pausemenu.png'); // Load pause menu image
         game.load.image('dead', 'assets/dead.png'); // Load dead droplet image
         game.load.audio('main', ['assets/main_music.mp3', 'assets/main_music.ogg']); // Load main game music
     },
     create: function ()
     {
-        game.stage.backgroundColor = 'rgb(154,129,83)'; //Background color to match image
-
-        backgroundPipe = game.add.sprite(0, 45, 'background'); // Add background image
+        game.stage.backgroundColor = 'rgb(82,82,82)'; //Background color to match image
 
         this.enter = game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
         this.enter.onDown.add(function () { // When enter key is pressed, game is paused
