@@ -3,7 +3,58 @@
 // Property of Texas A&M Cease the Grease CSCE 482 Taylor Harris, Victor Martinez, Chance Eckert 
 
 var mainMusic;
+var jumpSound;
+var deathSound;
 
+
+var Oil = function (game, x, y, frame) {
+    Phaser.Sprite.call(this, game, x, y, 'oil', frame);
+    this.anchor.setTo(0.5, 0.5);
+    this.game.physics.arcade.enableBody(this);
+
+    this.body.allowGravity = false;
+    this.body.immovable = true;
+
+};
+
+var OilGroup = function (game, parent) {
+    Phaser.Group.call(this, game, parent);
+
+    this.topOil = new Oil(this.game, 400, 0, 0);
+    this.add(this.topOil);
+
+    this.bottomOil = new Oil(this.game, 400, 440, 1);
+    this.add(this.bottomOil);
+
+    this.hasScored = false;
+
+    this.setAll('body.velocity.x', (-200 - (5 * score)));
+};
+
+OilGroup.prototype = Object.create(Phaser.Group.prototype);  
+OilGroup.prototype.constructor = OilGroup;
+
+OilGroup.prototype.reset = function (x, y) {
+
+    // Step 1    
+    this.topOil.reset(400, 0);
+
+    // Step 2
+    this.bottomOil.reset(400, 440); // Step 2
+
+    // Step 3
+    this.x = x;
+    this.y = y;
+
+    // Step 4
+    this.setAll('body.velocity.x', (-200 - (5 * score)));
+
+    // Step 5
+    this.hasScored = false;
+
+    // Step 6
+    this.exists = true;
+};
 var mainState = {
     preload: function ()
     {
@@ -13,7 +64,9 @@ var mainState = {
         game.load.image('pausemenu', 'assets/pausemenu.png'); // Load pause menu image
         game.load.image('dead', 'assets/dead.png'); // Load dead droplet image
         game.load.audio('main', ['assets/main_music.mp3', 'assets/main_music.ogg']); // Load main game music
-    },
+		game.load.audio('jump', ['assets/jump_noise.mp3', 'assets/jump_noise.ogg']); // Load jump soud
+		game.load.audio('death', ['assets/death_sound.mp3', 'assets/death_sound.ogg']); // Load death soud
+	},
     create: function ()
     {
         game.stage.backgroundColor = 'rgb(82,82,82)'; //Background color to match image
@@ -75,15 +128,19 @@ var mainState = {
 
         this.droplet.body.gravity.y = 1000; // Makes droplet fall 
 
+       // this.oilGenerator = null;
+        
         var spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR); // Jump when spacebar is pressed
         spaceKey.onDown.add(this.jump, this);
 
         var mouseClick = game.input;
 
         this.oils = game.add.group();
-        this.oils.hasScored = false;
 
-        this.timer = game.time.events.loop(1500, this.addRowOfOils, this);
+		this.timer = game.time.events.loop(1500, this.addRowOfOils, this); 
+		
+        //this.oilGenerator = this.game.time.events.loop(1500, this.generateOils, this);
+        //this.oilGenerator.timer.start();
 
         this.score = 0;	// Score initialized to zero and displayed at the top left corner of the screen
         this.scoreLabel = game.add.text(20, 20, "0");
@@ -92,6 +149,8 @@ var mainState = {
         this.scoreLabel.fontSize = 30;
 
         mainMusic = game.add.audio('main'); // Music
+		jumpSound = game.add.audio('jump'); //Jump sound
+		deathSound = game.add.audio('death'); // Death sound
         mainMusic.play();
 
     },
@@ -113,17 +172,19 @@ var mainState = {
             game.state.start('over'); // If the dead droplet is out of the screen, end the game
         }
         game.physics.arcade.overlap(this.droplet, this.oils, this.endGame, null, this); // If the droplet and oil overlap, end the game
-
-        this.oils.forEach(function(oils) {
-            this.checkScore(oils);
-            this.game.physics.arcade.collide(this.droplet, this.oils, this.endGame, null, this);
+/*
+        this.oils.forEach(function (oilGroup) {
+            this.checkScore(oilGroup);
+            this.game.physics.arcade.collide(this.droplet, oilGroup, this.endGame, null, this);
         }, this);
+		
        game.physics.arcade.collide(this.oils, this.droplet, this.endGame, null, this);
-
-    },
-    
+    */
+	},
     jump: function () // Make the droplet jump 
     {
+		jumpSound.stop();
+		jumpSound.play();
         this.droplet.body.velocity.y = -350; // Add a vertical velocity to the droplet
     },
     endGame: function () // End the game
@@ -131,7 +192,9 @@ var mainState = {
 		this.droplet.visible = !this.droplet.visible; // Make dead droplet invisible until collision occurs
 		this.droplet.body.enable = false;
 		
+		jumpSound.stop();
         mainMusic.stop();
+        deathSound.play();
 
 		this.deadDrop = game.add.sprite(this.droplet.x, this.droplet.y, 'dead'); // Replace droplet w/ dead droplet
 		game.physics.arcade.enable(this.deadDrop); // Add physics to dead droplet
@@ -240,17 +303,31 @@ var mainState = {
             
         }
       */ 
+    }              
+/*    generateOils: function () //should be like pipegenerato in example
+    {
+        var oilY = this.game.rnd.integerInRange(0, 440);
+        var oilGroup = this.oils.getFirstExists(false);
+        if (!oilGroup) {
+            oilGroup = new OilGroup(this.game, oils);
+        }
+        oilGroup.reset(this.game.width + oilGroup.width / 2, oilY);
+
     },
-    checkScore: function (oils) {
-        if (oils.exists && !oils.hasScored && oils.world.x < 100 ) {
-                    oils.hasScored = true;
-                    score += 1;
-                    this.scoreLabel.text = score;
-                    
+    checkScore: function (oilGroup) {
+        console.log("Starting checkscore");
+        if (oilGroup.exists && !oilGroup.hasScored && oilGroup.topOil.world.x <= this.bird.world.x) {
+            console.log("if logic passed");
+            oilGroup.hasScored = true;
+            score += 1;
+            console.log("score incremented");
+            this.scoreLabel.text = score;
+
         }
     }
+*/
 };
-
+      
 var gameOverState = {
     preload: function ()
     {
