@@ -6,6 +6,55 @@ var mainMusic;
 var jumpSound;
 var deathSound;
 
+
+var Oil = function (game, x, y, frame) {
+    Phaser.Sprite.call(this, game, x, y, 'oil', frame);
+    this.anchor.setTo(0.5, 0.5);
+    this.game.physics.arcade.enableBody(this);
+
+    this.body.allowGravity = false;
+    this.body.immovable = true;
+
+};
+
+var OilGroup = function (game, parent) {
+    Phaser.Group.call(this, game, parent);
+
+    this.topOil = new Oil(this.game, 400, 0, 0);
+    this.add(this.topOil);
+
+    this.bottomOil = new Oil(this.game, 400, 440, 1);
+    this.add(this.bottomOil);
+
+    this.hasScored = false;
+
+    this.setAll('body.velocity.x', (-200 - (5 * score)));
+};
+
+OilGroup.prototype = Object.create(Phaser.Group.prototype);  
+OilGroup.prototype.constructor = OilGroup;
+
+OilGroup.prototype.reset = function (x, y) {
+
+    // Step 1    
+    this.topOil.reset(400, 0);
+
+    // Step 2
+    this.bottomOil.reset(400, 440); // Step 2
+
+    // Step 3
+    this.x = x;
+    this.y = y;
+
+    // Step 4
+    this.setAll('body.velocity.x', (-200 - (5 * score)));
+
+    // Step 5
+    this.hasScored = false;
+
+    // Step 6
+    this.exists = true;
+};
 var mainState = {
     preload: function ()
     {
@@ -78,16 +127,18 @@ var mainState = {
         this.deadDrop = game.add.sprite(this.droplet.world.x, this.droplet.world.y, 'dead'); // Create dead droplet sprite for use when collision occurs
         game.physics.arcade.enable(this.deadDrop); // Add physics to dead droplet
         this.deadDrop.visible = !this.deadDrop.visible; // Make dead droplet invisible until collision occurs
-
+        
+        this.oilGenerator = null;
+        
         var spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR); // Jump when spacebar is pressed
         spaceKey.onDown.add(this.jump, this);
 
         var mouseClick = game.input;
 
         this.oils = game.add.group();
-        this.oils.hasScored = false;
 
-        this.timer = game.time.events.loop(1500, this.addRowOfOils, this);
+        this.oilGenerator = this.game.time.events.loop(1500, this.generateOils, this);
+        this.oilGenerator.timer.start();
 
         this.score = 0;	// Score initialized to zero and displayed at the top left corner of the screen
         this.scoreLabel = game.add.text(20, 20, "0");
@@ -120,14 +171,12 @@ var mainState = {
         }
         game.physics.arcade.collide(this.droplet, this.oils, this.endGame, null, this); // If the droplet and oil overlap, end the game
 
-        this.oils.forEach(function(oils) {
-            this.checkScore(oils);
-            this.game.physics.arcade.collide(this.droplet, this.oils, this.endGame, null, this);
+        this.oils.forEach(function (oilGroup) {
+            this.checkScore(oilGroup);
+            this.game.physics.arcade.collide(this.droplet, oilGroup, this.endGame, null, this);
         }, this);
 //        game.physics.arcade.collide(this.oils, this.droplet, this.endGame, null, this);
-
     },
-    
     jump: function () // Make the droplet jump 
     {
 		jumpSound.stop();
@@ -147,107 +196,126 @@ var mainState = {
 
 
     },
-    addOneOil: function (x, y) //need to speed up oil spawn or increase oils on screen
+//    addOneOil: function (x, y, frame) //need to speed up oil spawn or increase oils on screen
+//    {
+//        var oil = game.add.sprite(x, y, 'oil', frame); // Display oil at x, y
+//
+//        this.anchor.setTo(0.5, 0.5);
+//        this.game.physics.arcade.enableBody(this);
+//
+//        oil.body.allowGravity = false;
+//        oil.body.immovable = true;
+//
+//        oil.body.velocity.x = -200 - (5 * score); // Add velocity to the oil spill to make it move left
+//
+//        oil.checkWorldBounds = true;
+//        oil.outOfBoundsKill = true; // Kill the oil when its out of bounds
+//    },
+//    oilGroup: function () //treat like pipegenerator function
+//    {
+//        this.topOil = this.addOneOil(400, 0);
+//        this.oilGroup.add(this.topOil);
+//
+//        this.bottomOil = this.addOneOil(400, 440);
+//        this.oilGroup.add(this.bottomOil);
+//
+//        this.hasScored = false;
+//    },
+    generateOils: function () //should be like pipegenerato in example
     {
-        var oil = game.add.sprite(x, y, 'oil'); // Display oil at x, y
-
-        this.oils.add(oil);
-
-        game.physics.arcade.enable(oil);
-
-        oil.body.velocity.x = -200 - (5 * score); // Add velocity to the oil spill to make it move left
-
-        oil.checkWorldBounds = true;
-        oil.outOfBoundsKill = true; // Kill the oil when its out of bounds
-    },
-    addRowOfOils: function ()
-    {
-        var min = 0;
-        var max = 8;
-
-        var hole = Math.floor(Math.random() * (max - min + 1)) + min;
-        var frequency = Math.floor(Math.random() * (score - 1 + 1)) + 1;
-        // Randomly choose a # between 0-8 for the hole position
-        //0-8 should cover full y value of bound
-        //here on begins the oil generator
-        for (var i = 0; i < frequency; i++) {
-                for(var j = 0; j < 8; j++){
-                    switch(score){
-                        case (score<10):
-                            if (j !== hole && j !== (hole+1) && j !== (hole+2) && j !== (hole+3) && j!== (hole+4) && j !== (hole+5) && j !== (hole+6) && j !== (hole+7)){
-                                this.addOneOil(400, j * 60 + 10);
-                            }
-                            break;
-                        case (score>10 && score<20):
-                            if (j !== hole && j !== (hole+1) && j !== (hole+2) && j !== (hole+3) && j!== (hole+4) && j !== (hole+5) && j !== (hole+6)){
-                                this.addOneOil(400, j * 60 + 10);
-                            }
-                            break;
-                        case (score>20 && score<30):
-                            if (j !== hole && j !== (hole+1) && j !== (hole+2) && j !== (hole+3) && j!== (hole+4) && j !== (hole+5)){
-                                this.addOneOil(400, j * 60 + 10);
-                            }
-                            break;
-                        case (score>30 && score<40):
-                            if (j !== hole && j !== (hole+1) && j !== (hole+2) && j !== (hole+3) && j!== (hole+4)){
-                                this.addOneOil(400, j * 60 + 10);
-                            }
-                            break;
-                        case (score>40 && score<50):
-                            if (j !== hole && j !== (hole+1) && j !== (hole+2) && j !== (hole+3)){
-                                this.addOneOil(400, j * 60 + 10);
-                            }
-                            break;
-                        case (score>50 && score<60):
-                            if (j !== hole && j !== (hole+1) && j !== (hole+2)){
-                                this.addOneOil(400, j * 60 + 10);
-                            }
-                            break;
-                        case (score>60 && score<70):
-                            if(j !== hole && j !== (hole+1)){
-                                this.addOneOil(400, j * 60 + 10);
-                        
-                            }
-                            break;
-                        case (score>70):
-                            if(j !== hole){
-                                this.addOneOil(400, j * 60 + 10);
-                        
-                            }
-                            break;
-                        default:
-                            if(score<70){
-                                if (j === hole){
-                                    this.addOneOil(400, j * 60 + 10);
-                                }
-                            }
-                            if (score >70){
-                                if(j !== hole){
-                                    this.addOneOil(400, j * 60 + 10);
-                        
-                                }
-                                
-                            }
-                    }
-                    
-                }
-            
-            
+        var oilY = this.game.rnd.integerInRange(0, 440);
+        var oilGroup = this.oils.getFirstExists(false);
+        if (!oilGroup) {
+            oilGroup = new OilGroup(this.game, oils);
         }
-       
+        oilGroup.reset(this.game.width + oilGroup.width / 2, oilY);
+
     },
-//  if (oils.exists && !oils.hasScored && oils.oil.world.centerX <= this.droplet.world.x ) {
-    //when working should add to score when called
-    checkScore: function (oils) {
-        if (oils.exists && !oils.hasScored && oils.world.x < 100 ) {
-                    oils.hasScored = true;
-                    score += 1;
-                    this.scoreLabel.text = score;
-                    
+    checkScore: function (oilGroup) {
+        console.log("Starting checkscore");
+        if (oilGroup.exists && !oilGroup.hasScored && oilGroup.topOil.world.x <= this.bird.world.x) {
+            console.log("if logic passed");
+            oilGroup.hasScored = true;
+            score += 1;
+            console.log("score incremented");
+            this.scoreLabel.text = score;
+
         }
     }
 };
-
+//        var min = 0;
+//        var max = 8;
+//
+//        var hole = Math.floor(Math.random() * (max - min + 1)) + min;
+//        var frequency = Math.floor(Math.random() * (score - 1 + 1)) + 1;
+//        // Randomly choose a # between 0-8 for the hole position
+//        //0-8 should cover full y value of bound
+//        //here on begins the oil generator
+//        for (var i = 0; i < frequency; i++) {
+//                for(var j = 0; j < 8; j++){
+//                    switch(score){
+//                        case (score<10):
+//                            if (j !== hole && j !== (hole+1) && j !== (hole+2) && j !== (hole+3) && j!== (hole+4) && j !== (hole+5) && j !== (hole+6) && j !== (hole+7)){
+//                                this.addOneOil(400, j * 60 + 10);
+//                            }
+//                            break;
+//                        case (score>10 && score<20):
+//                            if (j !== hole && j !== (hole+1) && j !== (hole+2) && j !== (hole+3) && j!== (hole+4) && j !== (hole+5) && j !== (hole+6)){
+//                                this.addOneOil(400, j * 60 + 10);
+//                            }
+//                            break;
+//                        case (score>20 && score<30):
+//                            if (j !== hole && j !== (hole+1) && j !== (hole+2) && j !== (hole+3) && j!== (hole+4) && j !== (hole+5)){
+//                                this.addOneOil(400, j * 60 + 10);
+//                            }
+//                            break;
+//                        case (score>30 && score<40):
+//                            if (j !== hole && j !== (hole+1) && j !== (hole+2) && j !== (hole+3) && j!== (hole+4)){
+//                                this.addOneOil(400, j * 60 + 10);
+//                            }
+//                            break;
+//                        case (score>40 && score<50):
+//                            if (j !== hole && j !== (hole+1) && j !== (hole+2) && j !== (hole+3)){
+//                                this.addOneOil(400, j * 60 + 10);
+//                            }
+//                            break;
+//                        case (score>50 && score<60):
+//                            if (j !== hole && j !== (hole+1) && j !== (hole+2)){
+//                                this.addOneOil(400, j * 60 + 10);
+//                            }
+//                            break;
+//                        case (score>60 && score<70):
+//                            if(j !== hole && j !== (hole+1)){
+//                                this.addOneOil(400, j * 60 + 10);
+//                        
+//                            }
+//                            break;
+//                        case (score>70):
+//                            if(j !== hole){
+//                                this.addOneOil(400, j * 60 + 10);
+//                        
+//                            }
+//                            break;
+//                        default:
+//                            if(score<70){
+//                                if (j === hole){
+//                                    this.addOneOil(400, j * 60 + 10);
+//                                }
+//                            }
+//                            if (score >70){
+//                                if(j !== hole){
+//                                    this.addOneOil(400, j * 60 + 10);
+//                        
+//                                }
+//                                
+//                            }
+//                    }
+//                    
+//                }
+//            
+//            
+//        }
+//       
 var gameOverState = {
     preload: function ()
     {
@@ -429,8 +497,8 @@ var scoreState = {
 
         function getScore()
         {
-            scoreBackground.destroy(); // Delete score background image
-            scoreLabel.destroy(); // Delete score 
+            this.scoreBackground.destroy(); // Delete score background image
+            this.scoreLabel.destroy(); // Delete score 
             saveScoreButton.destroy(); // Delete save score button
 			twitterButton.destroy(); // Delete social media buttons
 			facebookButton.destroy(); // Delete social media buttons
