@@ -6,7 +6,6 @@ var mainMusic;
 var jumpSound;
 var deathSound;
 
-
 var Oil = function (game, x, y, frame) {
     Phaser.Sprite.call(this, game, x, y, 'oil', frame);
     this.anchor.setTo(0.5, 0.5);
@@ -55,29 +54,29 @@ OilGroup.prototype.reset = function (x, y) {
     // Step 6
     this.exists = true;
 };
+
 var mainState = {
     preload: function ()
     {
-        game.load.spritesheet('droplet', 'assets/droppp.png', 37, 62); // Load droplet animation frames	
-        game.load.image('background', 'assets/background7.png'); // Load background image
-        game.load.image('oil', 'assets/grease.png'); // Load oil image
-        game.load.image('pausemenu', 'assets/pausemenu.png'); // Load pause menu image
-        game.load.image('dead', 'assets/dead.png'); // Load dead droplet image
-        game.load.audio('main', ['assets/main_music.mp3', 'assets/main_music.ogg']); // Load main game music
-		game.load.audio('jump', ['assets/jump_noise.mp3', 'assets/jump_noise.ogg']); // Load jump soud
-		game.load.audio('death', ['assets/death_sound.mp3', 'assets/death_sound.ogg']); // Load death soud
+        game.load.spritesheet('droplet', 'assets/droplet/droplet.png', 37, 62); // Load droplet animation frames	
+        game.load.image('oil', 'assets/grease/grease.png'); // Load oil image
+        game.load.image('pauseButtons', 'assets/buttons/pauseButtons.png'); // Load pause buttons image
+        game.load.image('deadDroplet', 'assets/droplet/deadDroplet.png'); // Load dead droplet image
+        game.load.audio('main', ['assets/music/main_music.mp3', 'assets/music/main_music.ogg']); // Load main game music
+		game.load.audio('jump', ['assets/music/jump_noise.mp3', 'assets/music/jump_noise.ogg']); // Load jump soud
+		game.load.audio('death', ['assets/music/death_sound.mp3', 'assets/music/death_sound.ogg']); // Load death soud
 	},
     create: function ()
     {
-        game.stage.backgroundColor = 'rgb(82,82,82)'; //Background color to match image
+        game.stage.backgroundColor = 'rgb(82,82,82)'; //Background color to match image background color
 
         this.enter = game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
         this.enter.onDown.add(function () { // When enter key is pressed, game is paused
 
             game.paused = true; // Pause game 
 
-            pauseMenu = game.add.sprite(400 / 2, 490 / 2, 'pausemenu'); // Add pause menu options image
-            pauseMenu.anchor.setTo(0.5, 0.5);
+            pauseButtons = game.add.sprite(400 / 2, 490 / 2, 'pauseButtons'); // Add pause buttons image
+            pauseButtons.anchor.setTo(0.5, 0.5);
         }, this);
 
         game.input.onDown.add(unpause, self); // Input listener to unpause game when user clicks outside of the menu options
@@ -99,7 +98,7 @@ var mainState = {
 
                     if (selection === 0 || selection === 1 || selection === 2) // Display the choice
                     {
-                        this.pauseMenu.destroy(); // Remove pause menu image
+                        this.pauseButtons.destroy(); // Remove pause menu image
                         game.paused = false; // Unpause the game
                     } else
                     {
@@ -111,7 +110,7 @@ var mainState = {
             }
         };
         
-		this.deadDrop = game.add.sprite(0, 0, 'dead'); // Create dead droplet sprite for use when collision occurs
+		this.deadDrop = game.add.sprite(0, 0, 'deadDroplet'); // Create dead droplet sprite for use when collision occurs
 		game.physics.arcade.enable(this.deadDrop); // Add physics to dead droplet
 		this.deadDrop.visible = !this.deadDrop.visible; // Make dead droplet invisible until collision occurs
 		
@@ -162,17 +161,20 @@ var mainState = {
         } 
 		else if (this.droplet.y > 490)
         {
-            this.droplet.destroy();
-            mainMusic.stop();
+            this.droplet.destroy(); // Destroy droplet
+            jumpSound.stop(); // Stop jump music
+			mainMusic.stop(); // Stop main music
             game.state.start('over'); // If the droplet is out of the screen, end the game
         }
         else if (this.deadDrop.y > 490)
         {
-            this.deadDrop.destroy();
+            this.droplet.destroy(); // Destroy droplet
+			this.deadDrop.destroy(); // Destroy dead droplet
+			deathSound.stop(); // Stop death music when dead droplet is off screen 
             game.state.start('over'); // If the dead droplet is out of the screen, end the game
         }
         game.physics.arcade.overlap(this.droplet, this.oils, this.endGame, null, this); // If the droplet and oil overlap, end the game
-/*
+	/*
         this.oils.forEach(function (oilGroup) {
             this.checkScore(oilGroup);
             this.game.physics.arcade.collide(this.droplet, oilGroup, this.endGame, null, this);
@@ -189,14 +191,14 @@ var mainState = {
     },
     endGame: function () // End the game
     {
-		this.droplet.visible = !this.droplet.visible; // Make dead droplet invisible until collision occurs
-		this.droplet.body.enable = false;
+		this.droplet.visible = !this.droplet.visible; // Make droplet invisible while dead droplet is visible
+		this.droplet.body.enable = false; // Stop droplet in place
 		
 		jumpSound.stop();
         mainMusic.stop();
         deathSound.play();
 
-		this.deadDrop = game.add.sprite(this.droplet.x, this.droplet.y, 'dead'); // Replace droplet w/ dead droplet
+		this.deadDrop = game.add.sprite(this.droplet.x, this.droplet.y, 'deadDroplet'); // Replace droplet w/ dead droplet
 		game.physics.arcade.enable(this.deadDrop); // Add physics to dead droplet
 		this.deadDrop.body.gravity.y = 500; // Makes dead droplet fall
 		
@@ -304,7 +306,7 @@ var mainState = {
         }
       */ 
     }              
-/*    generateOils: function () //should be like pipegenerato in example
+/*   generateOils: function () //should be like pipegenerato in example
     {
         var oilY = this.game.rnd.integerInRange(0, 440);
         var oilGroup = this.oils.getFirstExists(false);
@@ -331,15 +333,14 @@ var mainState = {
 var gameOverState = {
     preload: function ()
     {
-        game.load.image('gameover', 'assets/gameover.png'); // Load game over image
-        game.load.image('dead', 'assets/dead.png'); // Load dead droplet image
+        game.load.image('gameOverBackground', 'assets/backgrounds/gameOver.png'); // Load game over image
     },
     create: function ()
     {
         game.stage.backgroundColor = 'rgb(0,0,0)'; //Background color black
 
-        gameOver = game.add.sprite(game.world.centerX, 245, 'gameover'); // Add game over image
-        gameOver.anchor.setTo(0.5, 0.5);
+        gameOverBackground = game.add.sprite(game.world.centerX, 245, 'gameOverBackground'); // Add game over image
+        gameOverBackground.anchor.setTo(0.5, 0.5);
 
         timer = 0;
 
@@ -349,9 +350,7 @@ var gameOverState = {
         gameOverLabel.fill = "#fff"; //White text
         gameOverLabel.fontSize = 10;
 
-        game.input.onDown.add(function () {
-            game.state.start('score');
-        }, self); // Input listener go to score screen on mouse click
+        game.input.onDown.add(function () { game.state.start('score'); }, self); // Input listener go to score screen on mouse click
     },
     update: function ()
     {
@@ -368,12 +367,12 @@ var gameOverState = {
 var leaderboardState = {
     preload: function ()
     {
-        game.load.image('mainMenu', 'assets/menubutton.png'); // Load main menu image
-        game.load.image('highscores', 'assets/highscore.png'); // Load high score image
+        game.load.image('menuButton', 'assets/buttons/menuButton.png'); // Load main menu image
+        game.load.image('highScores', 'assets/backgrounds/highScores.png'); // Load high score image
     },
     create: function ()
     {
-		highScoreBackground = game.add.sprite(0, 0, 'highscores'); // Add high score background image
+		highScoresBackground = game.add.sprite(0, 0, 'highScores'); // Add high score background image
 		
         if (localStorage.length > 0)
         {
@@ -395,7 +394,7 @@ var leaderboardState = {
                 scoresLabel.fontSize = 15;
             }
         }
-        var menuButton = game.add.button(game.world.centerX, game.world.centerY + 200, 'mainMenu', function () {
+        var menuButton = game.add.button(game.world.centerX, game.world.centerY + 200, 'menuButton', function () {
             game.state.start('menu');
         }, this, 2, 1, 0); // Main menu button
         menuButton.anchor.setTo(0.5, 0.5);
@@ -405,16 +404,16 @@ var leaderboardState = {
 var menuState = {
     preload: function ()
     {
-        game.load.image('title', 'assets/ceasethegrease.png'); // Load cease the grease title image
-        game.load.spritesheet('play', 'assets/plays.png', 300, 300); // Load play animation frames	
-        game.load.image('playbutton', 'assets/playbutton.png'); // Load play button image
+        game.load.image('ceaseGrease', 'assets/backgrounds/ceaseGrease.png'); // Load cease the grease title image
+        game.load.spritesheet('play', 'assets/buttons/play.png', 300, 300); // Load play animation frames	
+        game.load.image('playButton', 'assets/buttons/playButton.png'); // Load play button image
     },
     create: function ()
     {
         game.stage.backgroundColor = 'rgb(1,14,82)'; //Background color blue
 
-        title = game.add.sprite(game.world.centerX, 100, 'title'); // Add title image
-        title.anchor.setTo(0.5, 0.5);
+        ceaseGreaseBackground = game.add.sprite(game.world.centerX, 100, 'ceaseGrease'); // Add title image
+        ceaseGreaseBackground.anchor.setTo(0.5, 0.5);
 
         play = this.game.add.sprite(50, 175, 'play'); // Add play button animation at 50,175
         play.frame = 0; // Default frame is the first frame at position 0
@@ -423,7 +422,7 @@ var menuState = {
 
         play.animations.play('start'); // Play animation
 
-        var playButton = game.add.button(50 + 38, 175 + 113, 'playbutton', function () {
+        var playButton = game.add.button(50 + 38, 175 + 113, 'playButton', function () {
             game.state.start('story');
         }, this, 2, 1, 0); // Add play button over play animation to go to story screen
     }
@@ -432,35 +431,35 @@ var menuState = {
 var scoreState = {
     preload: function ()
     {
-        game.load.image('blankscore', 'assets/scoreblank.png'); // Load blank score image
-        game.load.image('savescore', 'assets/savescore.png'); // Load save score button
-		game.load.image('q', 'assets/q.png'); // Load alphabet
-		game.load.image('w', 'assets/w.png'); // Load alphabet
-		game.load.image('e', 'assets/e.png'); // Load alphabet
-		game.load.image('r', 'assets/r.png'); // Load alphabet
-		game.load.image('t', 'assets/t.png'); // Load alphabet
-		game.load.image('y', 'assets/y.png'); // Load alphabet
-		game.load.image('u', 'assets/u.png'); // Load alphabet
-		game.load.image('i', 'assets/i.png'); // Load alphabet
-		game.load.image('o', 'assets/o.png'); // Load alphabet
-		game.load.image('p', 'assets/p.png'); // Load alphabet
-		game.load.image('a', 'assets/a.png'); // Load alphabet
-		game.load.image('s', 'assets/s.png'); // Load alphabet
-		game.load.image('d', 'assets/d.png'); // Load alphabet
-		game.load.image('f', 'assets/f.png'); // Load alphabet
-		game.load.image('g', 'assets/g.png'); // Load alphabet
-		game.load.image('h', 'assets/h.png'); // Load alphabet
-		game.load.image('j', 'assets/j.png'); // Load alphabet
-		game.load.image('k', 'assets/k.png'); // Load alphabet
-		game.load.image('l', 'assets/l.png'); // Load alphabet
-		game.load.image('z', 'assets/z.png'); // Load alphabet
-		game.load.image('x', 'assets/x.png'); // Load alphabet
-		game.load.image('c', 'assets/c.png'); // Load alphabet
-		game.load.image('v', 'assets/v.png'); // Load alphabet
-		game.load.image('b', 'assets/b.png'); // Load alphabet
-		game.load.image('n', 'assets/n.png'); // Load alphabet
-		game.load.image('m', 'assets/m.png'); // Load alphabet
-		game.load.image('enter', 'assets/enter.png'); // Load enter button
+        game.load.image('scoreBackground', 'assets/backgrounds/score.png'); // Load blank score image
+        game.load.image('scoreButton', 'assets/buttons/scoreButton.png'); // Load save score button
+		game.load.image('q', 'assets/keyboard/q.png'); // Load alphabet
+		game.load.image('w', 'assets/keyboard/w.png'); // Load alphabet
+		game.load.image('e', 'assets/keyboard/e.png'); // Load alphabet
+		game.load.image('r', 'assets/keyboard/r.png'); // Load alphabet
+		game.load.image('t', 'assets/keyboard/t.png'); // Load alphabet
+		game.load.image('y', 'assets/keyboard/y.png'); // Load alphabet
+		game.load.image('u', 'assets/keyboard/u.png'); // Load alphabet
+		game.load.image('i', 'assets/keyboard/i.png'); // Load alphabet
+		game.load.image('o', 'assets/keyboard/o.png'); // Load alphabet
+		game.load.image('p', 'assets/keyboard/p.png'); // Load alphabet
+		game.load.image('a', 'assets/keyboard/a.png'); // Load alphabet
+		game.load.image('s', 'assets/keyboard/s.png'); // Load alphabet
+		game.load.image('d', 'assets/keyboard/d.png'); // Load alphabet
+		game.load.image('f', 'assets/keyboard/f.png'); // Load alphabet
+		game.load.image('g', 'assets/keyboard/g.png'); // Load alphabet
+		game.load.image('h', 'assets/keyboard/h.png'); // Load alphabet
+		game.load.image('j', 'assets/keyboard/j.png'); // Load alphabet
+		game.load.image('k', 'assets/keyboard/k.png'); // Load alphabet
+		game.load.image('l', 'assets/keyboard/l.png'); // Load alphabet
+		game.load.image('z', 'assets/keyboard/z.png'); // Load alphabet
+		game.load.image('x', 'assets/keyboard/x.png'); // Load alphabet
+		game.load.image('c', 'assets/keyboard/c.png'); // Load alphabet
+		game.load.image('v', 'assets/keyboard/v.png'); // Load alphabet
+		game.load.image('b', 'assets/keyboard/b.png'); // Load alphabet
+		game.load.image('n', 'assets/keyboard/n.png'); // Load alphabet
+		game.load.image('m', 'assets/keyboard/m.png'); // Load alphabet
+		game.load.image('enter', 'assets/keyboard/enter.png'); // Load enter 
     },
     create: function ()
     {
@@ -486,7 +485,7 @@ var scoreState = {
 			return false;
 		}, this);     
         
-        scoreBackground = game.add.sprite(0, 0, 'blankscore'); // Add background image
+        scoreBackground = game.add.sprite(0, 0, 'scoreBackground'); // Add background image
 
         scoreLabel = game.add.text(game.world.centerX, game.world.centerY - 55, score); // Score text
         scoreLabel.anchor.setTo(0.5, 0.5);
@@ -494,8 +493,8 @@ var scoreState = {
         scoreLabel.fill = "#fff"; // White text
         scoreLabel.fontSize = 50;
 
-        var saveScoreButton = game.add.button(game.world.centerX, game.world.centerY + 190, 'savescore', getScore, this, 2, 1, 0); // Save score button
-        saveScoreButton.anchor.setTo(0.5, 0.5);
+        var scoreButton = game.add.button(game.world.centerX, game.world.centerY + 190, 'scoreButton', getScore, this, 2, 1, 0); // Save score button
+        scoreButton.anchor.setTo(0.5, 0.5);
 
         word = "";
         prevLetter = "";
@@ -511,7 +510,7 @@ var scoreState = {
         {
             scoreBackground.destroy(); // Delete score background image
             scoreLabel.destroy(); // Delete score 
-            saveScoreButton.destroy(); // Delete save score button
+            scoreButton.destroy(); // Delete save score button
 			twitterButton.destroy(); // Delete social media buttons
 			facebookButton.destroy(); // Delete social media buttons
 
@@ -594,7 +593,7 @@ var scoreState = {
 var storyState = {
     preload: function ()
     {
-        game.load.image('letsgo', 'assets/letsgo.png'); // Load let's go droplet image
+        game.load.image('factDroplet', 'assets/droplet/factDroplet.png'); // Load let's go droplet image
     },
     create: function ()
     {
@@ -616,8 +615,8 @@ var storyState = {
         instLabel.fill = "#fff"; // White text
         instLabel.fontSize = 12;
 
-        letsGo = game.add.sprite(game.world.centerX, game.world.centerY + 25, 'letsgo'); // Add let's go droplet image
-        letsGo.anchor.setTo(0.5, 0.5);
+        factDroplet = game.add.sprite(game.world.centerX, game.world.centerY + 25, 'factDroplet'); // Add fact droplet image
+        factDroplet.anchor.setTo(0.5, 0.5);
 
         var storyLabel = game.add.text(game.world.centerX, game.world.centerY + 200, 'Click anywhere to start game'); // Story text
         storyLabel.anchor.setTo(0.5, 0.5);
@@ -625,9 +624,7 @@ var storyState = {
         storyLabel.fill = "#fff"; // White text
         storyLabel.fontSize = 12;
 
-        game.input.onDown.add(function () {
-            game.state.start('main');
-        }, self); // Input listener to start game on mouse click
+        game.input.onDown.add(function () { game.state.start('main'); }, self); // Input listener to start game on mouse click
     }
 };
 
