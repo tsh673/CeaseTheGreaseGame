@@ -278,14 +278,13 @@ var gameOverState = {
 var leaderboardState = {
     preload: function ()
     {
-        game.load.image('mainMenu', 'assets/mainMenu.png'); // Load main menu image
-        game.load.image('leaderbrd', 'assets/leaderbrd.png'); // Load leaderboard title image
+        game.load.image('mainMenu', 'assets/menubutton.png'); // Load main menu image
+        game.load.image('highscores', 'assets/highscore.png'); // Load high score image
     },
     create: function ()
     {
-        leaderBoard = game.add.sprite(game.world.centerX, 40, 'leaderbrd'); // Add leaderboard image
-        leaderBoard.anchor.setTo(0.5, 0.5);
-
+		highScoreBackground = game.add.sprite(0, 0, 'highscores'); // Add high score background image
+		
         if (localStorage.length > 0)
         {
             var localStorageArray = new Array();
@@ -297,16 +296,16 @@ var leaderboardState = {
                 return b - a;
             }); // Sort scores in decreasing order
 
-            for (var n = 0; n < localStorageArray.length && n < 9; n++) // Iterate through every initials/score pair
+            for (var n = 0; n < localStorageArray.length && n < 7; n++) // Iterate through every initials/score pair
             {
-                scoresLabel = game.add.text(game.world.centerX, 100 + (n * 30), localStorage.getItem(localStorageArray[n]) + "             " + localStorageArray[n]); // Display top 9 initials and score
+                scoresLabel = game.add.text(game.world.centerX, 215 + (n * 30), localStorage.getItem(localStorageArray[n]) + "           " + localStorageArray[n]); // Display top 9 initials and score
                 scoresLabel.anchor.setTo(0.5, 0.5);
                 scoresLabel.font = "Press Start 2P";
                 scoresLabel.fill = "#fff"; // White text
-                scoresLabel.fontSize = 12;
+                scoresLabel.fontSize = 15;
             }
         }
-        var menuButton = game.add.button(game.world.centerX, game.world.centerY + 175, 'mainMenu', function () {
+        var menuButton = game.add.button(game.world.centerX, game.world.centerY + 200, 'mainMenu', function () {
             game.state.start('menu');
         }, this, 2, 1, 0); // Main menu button
         menuButton.anchor.setTo(0.5, 0.5);
