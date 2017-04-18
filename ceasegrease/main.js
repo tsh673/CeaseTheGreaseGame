@@ -56,9 +56,13 @@ var mainState = {
                     }
                 }
             }
-        }
-        ;
-        game.physics.startSystem(Phaser.Physics.ARCADE);
+        };
+        
+		this.deadDrop = game.add.sprite(0, 0, 'dead'); // Create dead droplet sprite for use when collision occurs
+		game.physics.arcade.enable(this.deadDrop); // Add physics to dead droplet
+		this.deadDrop.visible = !this.deadDrop.visible; // Make dead droplet invisible until collision occurs
+		
+		game.physics.startSystem(Phaser.Physics.ARCADE);
 
         this.droplet = game.add.sprite(100, 245, 'droplet'); // Add droplet sprite at 50,175
         this.droplet.frame = 0; // Default frame is the first frame at position 0
@@ -70,10 +74,6 @@ var mainState = {
         game.physics.arcade.enable(this.droplet); // Add physics to droplet
 
         this.droplet.body.gravity.y = 1000; // Makes droplet fall 
-
-        this.deadDrop = game.add.sprite(this.droplet.world.x, this.droplet.world.y, 'dead'); // Create dead droplet sprite for use when collision occurs
-        game.physics.arcade.enable(this.deadDrop); // Add physics to dead droplet
-        this.deadDrop.visible = !this.deadDrop.visible; // Make dead droplet invisible until collision occurs
 
         var spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR); // Jump when spacebar is pressed
         spaceKey.onDown.add(this.jump, this);
@@ -100,25 +100,25 @@ var mainState = {
         if (this.droplet.y < 0) //resets drippy's upper bound to 0
         {
             this.droplet.y = 0;
-        } else if (this.droplet.y > 490)
+        } 
+		else if (this.droplet.y > 490)
         {
-            //this.droplet.y = 490; //resets drippy's lower bound to max
             this.droplet.destroy();
             mainMusic.stop();
             game.state.start('over'); // If the droplet is out of the screen, end the game
         }
-        if (this.deadDrop.y > 490)
+        else if (this.deadDrop.y > 490)
         {
             this.deadDrop.destroy();
             game.state.start('over'); // If the dead droplet is out of the screen, end the game
         }
-        game.physics.arcade.collide(this.droplet, this.oils, this.endGame, null, this); // If the droplet and oil overlap, end the game
+        game.physics.arcade.overlap(this.droplet, this.oils, this.endGame, null, this); // If the droplet and oil overlap, end the game
 
         this.oils.forEach(function(oils) {
             this.checkScore(oils);
             this.game.physics.arcade.collide(this.droplet, this.oils, this.endGame, null, this);
         }, this);
-//        game.physics.arcade.collide(this.oils, this.droplet, this.endGame, null, this);
+       game.physics.arcade.collide(this.oils, this.droplet, this.endGame, null, this);
 
     },
     
@@ -128,14 +128,15 @@ var mainState = {
     },
     endGame: function () // End the game
     {
-        this.droplet.destroy(); // Remove droplet image 
-
+		this.droplet.visible = !this.droplet.visible; // Make dead droplet invisible until collision occurs
+		this.droplet.body.enable = false;
+		
         mainMusic.stop();
 
-        this.deadDrop.visible = !this.deadDrop.visible;// Replace droplet w/ dead droplet
-        this.deadDrop.body.gravity.y = 500; // Makes dead droplet fall
-
-
+		this.deadDrop = game.add.sprite(this.droplet.x, this.droplet.y, 'dead'); // Replace droplet w/ dead droplet
+		game.physics.arcade.enable(this.deadDrop); // Add physics to dead droplet
+		this.deadDrop.body.gravity.y = 500; // Makes dead droplet fall
+		
     },
     addOneOil: function (x, y) //need to speed up oil spawn or increase oils on screen
     {
@@ -145,13 +146,27 @@ var mainState = {
 
         game.physics.arcade.enable(oil);
 
-        oil.body.velocity.x = -200 - (5 * score); // Add velocity to the oil spill to make it move left
+        oil.body.velocity.x = -200 /*- (5 * score)*/; // Add velocity to the oil spill to make it move left
 
         oil.checkWorldBounds = true;
         oil.outOfBoundsKill = true; // Kill the oil when its out of bounds
     },
     addRowOfOils: function ()
     {
+		
+		// Randomly pick a number between 1 and 5
+		// This will be the hole position
+		var hole = Math.floor(Math.random() * 5) + 1;
+
+		// Add the 6 oils 
+		// With one big hole at position 'hole' and 'hole + 1'
+		for (var i = 0; i < 8; i++)
+			if (i != hole && i != hole + 1) 
+				this.addOneOil(400, i * 60 + 10); 
+			
+		score += 1;
+		this.scoreLabel.text = score; 
+	/*	
         var min = 0;
         var max = 8;
 
@@ -224,10 +239,8 @@ var mainState = {
             
             
         }
-       
+      */ 
     },
-//  if (oils.exists && !oils.hasScored && oils.oil.world.centerX <= this.droplet.world.x ) {
-    //when working should add to score when called
     checkScore: function (oils) {
         if (oils.exists && !oils.hasScored && oils.world.x < 100 ) {
                     oils.hasScored = true;
