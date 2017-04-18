@@ -3,6 +3,8 @@
 // Property of Texas A&M Cease the Grease CSCE 482 Taylor Harris, Victor Martinez, Chance Eckert 
 
 var mainMusic;
+var jumpSound;
+var deathSound;
 
 var mainState = {
     preload: function ()
@@ -13,7 +15,9 @@ var mainState = {
         game.load.image('pausemenu', 'assets/pausemenu.png'); // Load pause menu image
         game.load.image('dead', 'assets/dead.png'); // Load dead droplet image
         game.load.audio('main', ['assets/main_music.mp3', 'assets/main_music.ogg']); // Load main game music
-    },
+		game.load.audio('jump', ['assets/jump_noise.mp3', 'assets/jump_noise.ogg']); // Load jump soud
+		game.load.audio('death', ['assets/death_sound.mp3', 'assets/death_sound.ogg']); // Load death soud
+	},
     create: function ()
     {
         game.stage.backgroundColor = 'rgb(82,82,82)'; //Background color to match image
@@ -92,6 +96,8 @@ var mainState = {
         this.scoreLabel.fontSize = 30;
 
         mainMusic = game.add.audio('main'); // Music
+		jumpSound = game.add.audio('jump'); //Jump sound
+		deathSound = game.add.audio('death'); // Death sound
         mainMusic.play();
 
     },
@@ -124,13 +130,17 @@ var mainState = {
     
     jump: function () // Make the droplet jump 
     {
+		jumpSound.stop();
+		jumpSound.play();
         this.droplet.body.velocity.y = -350; // Add a vertical velocity to the droplet
     },
     endGame: function () // End the game
     {
         this.droplet.destroy(); // Remove droplet image 
-
+		
+		jumpSound.stop();
         mainMusic.stop();
+        deathSound.play();
 
         this.deadDrop.visible = !this.deadDrop.visible;// Replace droplet w/ dead droplet
         this.deadDrop.body.gravity.y = 500; // Makes dead droplet fall
