@@ -30,7 +30,7 @@ var OilGroup = function (game, parent) {
     this.setAll('body.velocity.x', (-200 - (5 * score)));
 };
 
-OilGroup.prototype = Object.create(Phaser.Group.prototype);  
+OilGroup.prototype = Object.create(Phaser.Group.prototype);
 OilGroup.prototype.constructor = OilGroup;
 
 OilGroup.prototype.reset = function (x, y) {
@@ -63,9 +63,9 @@ var mainState = {
         game.load.image('pauseButtons', 'assets/buttons/pauseButtons.png'); // Load pause buttons image
         game.load.image('deadDroplet', 'assets/droplet/deadDroplet.png'); // Load dead droplet image
         game.load.audio('main', ['assets/music/main_music.mp3', 'assets/music/main_music.ogg']); // Load main game music
-		game.load.audio('jump', ['assets/music/jump_noise.mp3', 'assets/music/jump_noise.ogg']); // Load jump soud
-		game.load.audio('death', ['assets/music/death_sound.mp3', 'assets/music/death_sound.ogg']); // Load death soud
-	},
+        game.load.audio('jump', ['assets/music/jump_noise.mp3', 'assets/music/jump_noise.ogg']); // Load jump soud
+        game.load.audio('death', ['assets/music/death_sound.mp3', 'assets/music/death_sound.ogg']); // Load death soud
+    },
     create: function ()
     {
         game.stage.backgroundColor = 'rgb(82,82,82)'; //Background color to match image background color
@@ -108,13 +108,14 @@ var mainState = {
                     }
                 }
             }
-        };
-        
-		this.deadDrop = game.add.sprite(0, 0, 'deadDroplet'); // Create dead droplet sprite for use when collision occurs
-		game.physics.arcade.enable(this.deadDrop); // Add physics to dead droplet
-		this.deadDrop.visible = !this.deadDrop.visible; // Make dead droplet invisible until collision occurs
-		
-		game.physics.startSystem(Phaser.Physics.ARCADE);
+        }
+        ;
+
+        this.deadDrop = game.add.sprite(0, 0, 'deadDroplet'); // Create dead droplet sprite for use when collision occurs
+        game.physics.arcade.enable(this.deadDrop); // Add physics to dead droplet
+        this.deadDrop.visible = !this.deadDrop.visible; // Make dead droplet invisible until collision occurs
+
+        game.physics.startSystem(Phaser.Physics.ARCADE);
 
         this.droplet = game.add.sprite(100, 245, 'droplet'); // Add droplet sprite at 50,175
         this.droplet.frame = 0; // Default frame is the first frame at position 0
@@ -127,8 +128,8 @@ var mainState = {
 
         this.droplet.body.gravity.y = 1000; // Makes droplet fall 
 
-       // this.oilGenerator = null;
-        
+        // this.oilGenerator = null;
+
         var spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR); // Jump when spacebar is pressed
         spaceKey.onDown.add(this.jump, this);
 
@@ -136,8 +137,8 @@ var mainState = {
 
         this.oils = game.add.group();
 
-		this.timer = game.time.events.loop(1500, this.addRowOfOils, this); 
-		
+        this.timer = game.time.events.loop(1500, this.addRowOfOils, this);
+
         //this.oilGenerator = this.game.time.events.loop(1500, this.generateOils, this);
         //this.oilGenerator.timer.start();
 
@@ -148,8 +149,8 @@ var mainState = {
         this.scoreLabel.fontSize = 30;
 
         mainMusic = game.add.audio('main'); // Music
-		jumpSound = game.add.audio('jump'); //Jump sound
-		deathSound = game.add.audio('death'); // Death sound
+        jumpSound = game.add.audio('jump'); //Jump sound
+        deathSound = game.add.audio('death'); // Death sound
         mainMusic.play();
 
     },
@@ -158,50 +159,44 @@ var mainState = {
         if (this.droplet.y < 0) //resets drippy's upper bound to 0
         {
             this.droplet.y = 0;
-        } 
-		else if (this.droplet.y > 490)
+        } else if (this.droplet.y > 490)
         {
             this.droplet.destroy(); // Destroy droplet
             jumpSound.stop(); // Stop jump music
-			mainMusic.stop(); // Stop main music
+            mainMusic.stop(); // Stop main music
             game.state.start('over'); // If the droplet is out of the screen, end the game
-        }
-        else if (this.deadDrop.y > 490)
+        } else if (this.deadDrop.y > 490)
         {
             this.droplet.destroy(); // Destroy droplet
-			this.deadDrop.destroy(); // Destroy dead droplet
-			deathSound.stop(); // Stop death music when dead droplet is off screen 
+            this.deadDrop.destroy(); // Destroy dead droplet
+            deathSound.stop(); // Stop death music when dead droplet is off screen 
             game.state.start('over'); // If the dead droplet is out of the screen, end the game
         }
         game.physics.arcade.overlap(this.droplet, this.oils, this.endGame, null, this); // If the droplet and oil overlap, end the game
-	/*
-        this.oils.forEach(function (oilGroup) {
-            this.checkScore(oilGroup);
-            this.game.physics.arcade.collide(this.droplet, oilGroup, this.endGame, null, this);
+         this.oils.forEach(function(oils) {
+            this.checkScore(oils);
+            this.game.physics.arcade.collide(this.droplet, this.oils, this.endGame, null, this);
         }, this);
-		
-       game.physics.arcade.collide(this.oils, this.droplet, this.endGame, null, this);
-    */
-	},
+    },
     jump: function () // Make the droplet jump 
     {
-		jumpSound.stop();
-		jumpSound.play();
+        jumpSound.stop();
+        jumpSound.play();
         this.droplet.body.velocity.y = -350; // Add a vertical velocity to the droplet
     },
     endGame: function () // End the game
     {
-		this.droplet.visible = !this.droplet.visible; // Make droplet invisible while dead droplet is visible
-		this.droplet.body.enable = false; // Stop droplet in place
-		
-		jumpSound.stop();
+        this.droplet.visible = !this.droplet.visible; // Make droplet invisible while dead droplet is visible
+        this.droplet.body.enable = false; // Stop droplet in place
+
+        jumpSound.stop();
         mainMusic.stop();
         deathSound.play();
 
-		this.deadDrop = game.add.sprite(this.droplet.x, this.droplet.y, 'deadDroplet'); // Replace droplet w/ dead droplet
-		game.physics.arcade.enable(this.deadDrop); // Add physics to dead droplet
-		this.deadDrop.body.gravity.y = 500; // Makes dead droplet fall
-		
+        this.deadDrop = game.add.sprite(this.droplet.x, this.droplet.y, 'deadDroplet'); // Replace droplet w/ dead droplet
+        game.physics.arcade.enable(this.deadDrop); // Add physics to dead droplet
+        this.deadDrop.body.gravity.y = 500; // Makes dead droplet fall
+
     },
     addOneOil: function (x, y) //need to speed up oil spawn or increase oils on screen
     {
@@ -218,118 +213,34 @@ var mainState = {
     },
     addRowOfOils: function ()
     {
-		
-		// Randomly pick a number between 1 and 5
-		// This will be the hole position
-		var hole = Math.floor(Math.random() * 5) + 1;
 
-		// Add the 6 oils 
-		// With one big hole at position 'hole' and 'hole + 1'
-		for (var i = 0; i < 8; i++)
-			if (i != hole && i != hole + 1) 
-				this.addOneOil(400, i * 60 + 10); 
-			
-		score += 1;
-		this.scoreLabel.text = score; 
-	/*	
-        var min = 0;
-        var max = 8;
+        // Randomly pick a number between 1 and 5
+        // This will be the hole position
+        var hole = Math.floor(Math.random() * 5) + 1;
 
-        var hole = Math.floor(Math.random() * (max - min + 1)) + min;
-        var frequency = Math.floor(Math.random() * (score - 1 + 1)) + 1;
-        // Randomly choose a # between 0-8 for the hole position
-        //0-8 should cover full y value of bound
-        //here on begins the oil generator
-        for (var i = 0; i < frequency; i++) {
-                for(var j = 0; j < 8; j++){
-                    switch(score){
-                        case (score<10):
-                            if (j !== hole && j !== (hole+1) && j !== (hole+2) && j !== (hole+3) && j!== (hole+4) && j !== (hole+5) && j !== (hole+6) && j !== (hole+7)){
-                                this.addOneOil(400, j * 60 + 10);
-                            }
-                            break;
-                        case (score>10 && score<20):
-                            if (j !== hole && j !== (hole+1) && j !== (hole+2) && j !== (hole+3) && j!== (hole+4) && j !== (hole+5) && j !== (hole+6)){
-                                this.addOneOil(400, j * 60 + 10);
-                            }
-                            break;
-                        case (score>20 && score<30):
-                            if (j !== hole && j !== (hole+1) && j !== (hole+2) && j !== (hole+3) && j!== (hole+4) && j !== (hole+5)){
-                                this.addOneOil(400, j * 60 + 10);
-                            }
-                            break;
-                        case (score>30 && score<40):
-                            if (j !== hole && j !== (hole+1) && j !== (hole+2) && j !== (hole+3) && j!== (hole+4)){
-                                this.addOneOil(400, j * 60 + 10);
-                            }
-                            break;
-                        case (score>40 && score<50):
-                            if (j !== hole && j !== (hole+1) && j !== (hole+2) && j !== (hole+3)){
-                                this.addOneOil(400, j * 60 + 10);
-                            }
-                            break;
-                        case (score>50 && score<60):
-                            if (j !== hole && j !== (hole+1) && j !== (hole+2)){
-                                this.addOneOil(400, j * 60 + 10);
-                            }
-                            break;
-                        case (score>60 && score<70):
-                            if(j !== hole && j !== (hole+1)){
-                                this.addOneOil(400, j * 60 + 10);
-                        
-                            }
-                            break;
-                        case (score>70):
-                            if(j !== hole){
-                                this.addOneOil(400, j * 60 + 10);
-                        
-                            }
-                            break;
-                        default:
-                            if(score<70){
-                                if (j === hole){
-                                    this.addOneOil(400, j * 60 + 10);
-                                }
-                            }
-                            if (score >70){
-                                if(j !== hole){
-                                    this.addOneOil(400, j * 60 + 10);
-                        
-                                }
-                                
-                            }
-                    }
-                    
-                }
-            
-            
+        // Add the 6 oils 
+        // With one big hole at position 'hole' and 'hole + 1'
+        for (var i = 0; i < 8; i++) {
+            if (i !== hole && i !== hole + 1 && i !== hole + 2) {
+                this.addOneOil(400, i * 60 + 10);
+            }
         }
-      */ 
-    }              
-/*   generateOils: function () //should be like pipegenerato in example
-    {
-        var oilY = this.game.rnd.integerInRange(0, 440);
-        var oilGroup = this.oils.getFirstExists(false);
-        if (!oilGroup) {
-            oilGroup = new OilGroup(this.game, oils);
-        }
-        oilGroup.reset(this.game.width + oilGroup.width / 2, oilY);
 
+        score += 1;
+        this.scoreLabel.text = score;
+        
     },
-    checkScore: function (oilGroup) {
-        console.log("Starting checkscore");
-        if (oilGroup.exists && !oilGroup.hasScored && oilGroup.topOil.world.x <= this.bird.world.x) {
-            console.log("if logic passed");
-            oilGroup.hasScored = true;
-            score += 1;
-            console.log("score incremented");
-            this.scoreLabel.text = score;
-
+    checkScore: function(oils)
+    {
+            if (oils.exists && !oils.hasScored && oils.world.x < 100 ) {
+                    oils.hasScored = true;
+                    score += 1;
+                    this.scoreLabel.text = score;
+                    
         }
     }
-*/
 };
-      
+
 var gameOverState = {
     preload: function ()
     {
@@ -350,7 +261,9 @@ var gameOverState = {
         gameOverLabel.fill = "#fff"; //White text
         gameOverLabel.fontSize = 10;
 
-        game.input.onDown.add(function () { game.state.start('score'); }, self); // Input listener go to score screen on mouse click
+        game.input.onDown.add(function () {
+            game.state.start('score');
+        }, self); // Input listener go to score screen on mouse click
     },
     update: function ()
     {
@@ -372,8 +285,8 @@ var leaderboardState = {
     },
     create: function ()
     {
-		highScoresBackground = game.add.sprite(0, 0, 'highScores'); // Add high score background image
-		
+        highScoresBackground = game.add.sprite(0, 0, 'highScores'); // Add high score background image
+
         if (localStorage.length > 0)
         {
             var localStorageArray = new Array();
@@ -433,58 +346,58 @@ var scoreState = {
     {
         game.load.image('scoreBackground', 'assets/backgrounds/score.png'); // Load blank score image
         game.load.image('scoreButton', 'assets/buttons/scoreButton.png'); // Load save score button
-		game.load.image('q', 'assets/keyboard/q.png'); // Load alphabet
-		game.load.image('w', 'assets/keyboard/w.png'); // Load alphabet
-		game.load.image('e', 'assets/keyboard/e.png'); // Load alphabet
-		game.load.image('r', 'assets/keyboard/r.png'); // Load alphabet
-		game.load.image('t', 'assets/keyboard/t.png'); // Load alphabet
-		game.load.image('y', 'assets/keyboard/y.png'); // Load alphabet
-		game.load.image('u', 'assets/keyboard/u.png'); // Load alphabet
-		game.load.image('i', 'assets/keyboard/i.png'); // Load alphabet
-		game.load.image('o', 'assets/keyboard/o.png'); // Load alphabet
-		game.load.image('p', 'assets/keyboard/p.png'); // Load alphabet
-		game.load.image('a', 'assets/keyboard/a.png'); // Load alphabet
-		game.load.image('s', 'assets/keyboard/s.png'); // Load alphabet
-		game.load.image('d', 'assets/keyboard/d.png'); // Load alphabet
-		game.load.image('f', 'assets/keyboard/f.png'); // Load alphabet
-		game.load.image('g', 'assets/keyboard/g.png'); // Load alphabet
-		game.load.image('h', 'assets/keyboard/h.png'); // Load alphabet
-		game.load.image('j', 'assets/keyboard/j.png'); // Load alphabet
-		game.load.image('k', 'assets/keyboard/k.png'); // Load alphabet
-		game.load.image('l', 'assets/keyboard/l.png'); // Load alphabet
-		game.load.image('z', 'assets/keyboard/z.png'); // Load alphabet
-		game.load.image('x', 'assets/keyboard/x.png'); // Load alphabet
-		game.load.image('c', 'assets/keyboard/c.png'); // Load alphabet
-		game.load.image('v', 'assets/keyboard/v.png'); // Load alphabet
-		game.load.image('b', 'assets/keyboard/b.png'); // Load alphabet
-		game.load.image('n', 'assets/keyboard/n.png'); // Load alphabet
-		game.load.image('m', 'assets/keyboard/m.png'); // Load alphabet
-		game.load.image('enter', 'assets/keyboard/enter.png'); // Load enter 
+        game.load.image('q', 'assets/keyboard/q.png'); // Load alphabet
+        game.load.image('w', 'assets/keyboard/w.png'); // Load alphabet
+        game.load.image('e', 'assets/keyboard/e.png'); // Load alphabet
+        game.load.image('r', 'assets/keyboard/r.png'); // Load alphabet
+        game.load.image('t', 'assets/keyboard/t.png'); // Load alphabet
+        game.load.image('y', 'assets/keyboard/y.png'); // Load alphabet
+        game.load.image('u', 'assets/keyboard/u.png'); // Load alphabet
+        game.load.image('i', 'assets/keyboard/i.png'); // Load alphabet
+        game.load.image('o', 'assets/keyboard/o.png'); // Load alphabet
+        game.load.image('p', 'assets/keyboard/p.png'); // Load alphabet
+        game.load.image('a', 'assets/keyboard/a.png'); // Load alphabet
+        game.load.image('s', 'assets/keyboard/s.png'); // Load alphabet
+        game.load.image('d', 'assets/keyboard/d.png'); // Load alphabet
+        game.load.image('f', 'assets/keyboard/f.png'); // Load alphabet
+        game.load.image('g', 'assets/keyboard/g.png'); // Load alphabet
+        game.load.image('h', 'assets/keyboard/h.png'); // Load alphabet
+        game.load.image('j', 'assets/keyboard/j.png'); // Load alphabet
+        game.load.image('k', 'assets/keyboard/k.png'); // Load alphabet
+        game.load.image('l', 'assets/keyboard/l.png'); // Load alphabet
+        game.load.image('z', 'assets/keyboard/z.png'); // Load alphabet
+        game.load.image('x', 'assets/keyboard/x.png'); // Load alphabet
+        game.load.image('c', 'assets/keyboard/c.png'); // Load alphabet
+        game.load.image('v', 'assets/keyboard/v.png'); // Load alphabet
+        game.load.image('b', 'assets/keyboard/b.png'); // Load alphabet
+        game.load.image('n', 'assets/keyboard/n.png'); // Load alphabet
+        game.load.image('m', 'assets/keyboard/m.png'); // Load alphabet
+        game.load.image('enter', 'assets/keyboard/enter.png'); // Load enter 
     },
     create: function ()
     {
         var facebookButton = this.add.graphics(0, 0);
-		facebookButton.lineStyle(2, 0x0000FF, 0.5);
-		facebookButton.beginFill(0xFF8080, 1);
- 		facebookButton.drawRect(game.world.centerX - 125, game.world.centerY + 30, 100, 100);            
-		facebookButton.endFill();
-		facebookButton.inputEnabled = true;            
-		facebookButton.events.onInputDown.add(function () {                
-			var fbpopup = window.open("https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fpeople.tamu.edu%2F%7Evalexis22009%2Fceasegrease%2F&amp", "pop", "width=600, height=400, scrollbars=no");
-			return false;
-		}, this);
-		
-		var twitterButton = this.add.graphics(0, 0);
-		twitterButton.lineStyle(2, 0x0000FF, 0.5);
-		twitterButton.beginFill(0xFF8080, 1);
- 		twitterButton.drawRect(game.world.centerX + 25, game.world.centerY + 30, 100, 100);            
-		twitterButton.endFill();
-		twitterButton.inputEnabled = true;            
-		twitterButton.events.onInputDown.add(function () {                
-			var twpopup = window.open("https://twitter.com/intent/tweet?text=Help Trippy Out! http://people.tamu.edu/~valexis22009/ceasegrease/", "pop", "width=600, height=400, scrollbars=no");
-			return false;
-		}, this);     
-        
+        facebookButton.lineStyle(2, 0x0000FF, 0.5);
+        facebookButton.beginFill(0xFF8080, 1);
+        facebookButton.drawRect(game.world.centerX - 125, game.world.centerY + 30, 100, 100);
+        facebookButton.endFill();
+        facebookButton.inputEnabled = true;
+        facebookButton.events.onInputDown.add(function () {
+            var fbpopup = window.open("https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fpeople.tamu.edu%2F%7Evalexis22009%2Fceasegrease%2F&amp", "pop", "width=600, height=400, scrollbars=no");
+            return false;
+        }, this);
+
+        var twitterButton = this.add.graphics(0, 0);
+        twitterButton.lineStyle(2, 0x0000FF, 0.5);
+        twitterButton.beginFill(0xFF8080, 1);
+        twitterButton.drawRect(game.world.centerX + 25, game.world.centerY + 30, 100, 100);
+        twitterButton.endFill();
+        twitterButton.inputEnabled = true;
+        twitterButton.events.onInputDown.add(function () {
+            var twpopup = window.open("https://twitter.com/intent/tweet?text=Help Trippy Out! http://people.tamu.edu/~valexis22009/ceasegrease/", "pop", "width=600, height=400, scrollbars=no");
+            return false;
+        }, this);
+
         scoreBackground = game.add.sprite(0, 0, 'scoreBackground'); // Add background image
 
         scoreLabel = game.add.text(game.world.centerX, game.world.centerY - 55, score); // Score text
@@ -511,8 +424,8 @@ var scoreState = {
             scoreBackground.destroy(); // Delete score background image
             scoreLabel.destroy(); // Delete score 
             scoreButton.destroy(); // Delete save score button
-			twitterButton.destroy(); // Delete social media buttons
-			facebookButton.destroy(); // Delete social media buttons
+            twitterButton.destroy(); // Delete social media buttons
+            facebookButton.destroy(); // Delete social media buttons
 
             initialsLabel = game.add.text(game.world.centerX, game.world.centerY - 200, 'Please enter your initials'); // Input initials text
             initialsLabel.anchor.setTo(0.5, 0.5);
@@ -520,66 +433,120 @@ var scoreState = {
             initialsLabel.fill = "rgb(182,145,35)"; // Tan text
             initialsLabel.fontSize = 12;
 
-			enterLabel = game.add.text(game.world.centerX, game.world.centerY - 175, 'Press ENTER to save score'); // Enter text
+            enterLabel = game.add.text(game.world.centerX, game.world.centerY - 175, 'Press ENTER to save score'); // Enter text
             enterLabel.anchor.setTo(0.5, 0.5);
             enterLabel.font = "Press Start 2P";
             enterLabel.fill = "rgb(182,145,35)"; // Tan text
             enterLabel.fontSize = 12;
-			
-			var qButton = game.add.button(5, game.world.centerY + 60, 'q', function () {
-            prevLetter = letter; letter = "Q.";}, this, 2, 1, 0); 
-			var wButton = game.add.button(44, game.world.centerY + 60, 'w', function () {
-            prevLetter = letter; letter = "W.";}, this, 2, 1, 0); // Keyboard button
-			var eButton = game.add.button(83, game.world.centerY + 60, 'e', function () {
-            prevLetter = letter; letter = "E.";}, this, 2, 1, 0); // Keyboard button
-			var rButton = game.add.button(122, game.world.centerY + 60, 'r', function () {
-            prevLetter = letter; letter = "R.";}, this, 2, 1, 0); // Keyboard button
-			var tButton = game.add.button(161, game.world.centerY + 60, 't', function () {
-            prevLetter = letter; letter = "T.";}, this, 2, 1, 0); // Keyboard button
-			var yButton = game.add.button(200, game.world.centerY + 60, 'y', function () {
-            prevLetter = letter; letter = "Y.";}, this, 2, 1, 0); // Keyboard button
-			var uButton = game.add.button(239, game.world.centerY + 60, 'u', function () {
-            prevLetter = letter; letter = "U.";}, this, 2, 1, 0); // Keyboard button
-			var iButton = game.add.button(278, game.world.centerY + 60, 'i', function () {
-            prevLetter = letter; letter = "I.";}, this, 2, 1, 0); // Keyboard button
-			var oButton = game.add.button(317, game.world.centerY + 60, 'o', function () {
-            prevLetter = letter; letter = "O.";}, this, 2, 1, 0); // Keyboard button
-			var pButton = game.add.button(356, game.world.centerY + 60, 'p', function () {
-            prevLetter = letter; letter = "P.";}, this, 2, 1, 0); // Keyboard button
-			var aButton = game.add.button(22, game.world.centerY + 100, 'a', function () {
-            prevLetter = letter; letter = "A.";}, this, 2, 1, 0); // Keyboard button
-			var sButton = game.add.button(61, game.world.centerY + 100, 's', function () {
-            prevLetter = letter; letter = "S.";}, this, 2, 1, 0); // Keyboard button
-			var dButton = game.add.button(100, game.world.centerY + 100, 'd', function () {
-            prevLetter = letter; letter = "D.";}, this, 2, 1, 0); // Keyboard button
-			var fButton = game.add.button(139, game.world.centerY + 100, 'f', function () {
-            prevLetter = letter; letter = "F.";}, this, 2, 1, 0); // Keyboard button
-			var gButton = game.add.button(178, game.world.centerY + 100, 'g', function () {
-            prevLetter = letter; letter = "G.";}, this, 2, 1, 0); // Keyboard button
-			var hButton = game.add.button(217, game.world.centerY + 100, 'h', function () {
-            prevLetter = letter; letter = "H.";}, this, 2, 1, 0); // Keyboard button
-			var jButton = game.add.button(256, game.world.centerY + 100, 'j', function () {
-            prevLetter = letter; letter = "J.";}, this, 2, 1, 0); // Keyboard button
-			var kButton = game.add.button(295, game.world.centerY + 100, 'k', function () {
-            prevLetter = letter; letter = "K.";}, this, 2, 1, 0); // Keyboard button
-			var lButton = game.add.button(334, game.world.centerY + 100, 'l', function () {
-            prevLetter = letter; letter = "L.";}, this, 2, 1, 0); // Keyboard button
-			var zButton = game.add.button(63, game.world.centerY + 140, 'z', function () {
-            prevLetter = letter; letter = "Z.";}, this, 2, 1, 0); // Keyboard button
-			var xButton = game.add.button(102, game.world.centerY + 140, 'x', function () {
-            prevLetter = letter; letter = "X.";}, this, 2, 1, 0); // Keyboard button
-			var cButton = game.add.button(141, game.world.centerY + 140, 'c', function () {
-            prevLetter = letter; letter = "C.";}, this, 2, 1, 0); // Keyboard button
-			var vButton = game.add.button(180, game.world.centerY + 140, 'v', function () {
-            prevLetter = letter; letter = "V.";}, this, 2, 1, 0); // Keyboard button
-			var bButton = game.add.button(219, game.world.centerY + 140, 'b', function () {
-            prevLetter = letter; letter = "B.";}, this, 2, 1, 0); // Keyboard button
-			var nButton = game.add.button(258, game.world.centerY + 140, 'n', function () {
-            prevLetter = letter; letter = "N.";}, this, 2, 1, 0); // Keyboard button
-			var mButton = game.add.button(297, game.world.centerY + 140, 'm', function () {
-            prevLetter = letter; letter = "M.";}, this, 2, 1, 0); // Keyboard button
-			var entButton = game.add.button(143, game.world.centerY + 180, 'enter', function () {
-            localStorage.setItem(score.toString(), word); game.state.start('leader');}, this, 2, 1, 0); // Enter button
+
+            var qButton = game.add.button(5, game.world.centerY + 60, 'q', function () {
+                prevLetter = letter;
+                letter = "Q.";
+            }, this, 2, 1, 0);
+            var wButton = game.add.button(44, game.world.centerY + 60, 'w', function () {
+                prevLetter = letter;
+                letter = "W.";
+            }, this, 2, 1, 0); // Keyboard button
+            var eButton = game.add.button(83, game.world.centerY + 60, 'e', function () {
+                prevLetter = letter;
+                letter = "E.";
+            }, this, 2, 1, 0); // Keyboard button
+            var rButton = game.add.button(122, game.world.centerY + 60, 'r', function () {
+                prevLetter = letter;
+                letter = "R.";
+            }, this, 2, 1, 0); // Keyboard button
+            var tButton = game.add.button(161, game.world.centerY + 60, 't', function () {
+                prevLetter = letter;
+                letter = "T.";
+            }, this, 2, 1, 0); // Keyboard button
+            var yButton = game.add.button(200, game.world.centerY + 60, 'y', function () {
+                prevLetter = letter;
+                letter = "Y.";
+            }, this, 2, 1, 0); // Keyboard button
+            var uButton = game.add.button(239, game.world.centerY + 60, 'u', function () {
+                prevLetter = letter;
+                letter = "U.";
+            }, this, 2, 1, 0); // Keyboard button
+            var iButton = game.add.button(278, game.world.centerY + 60, 'i', function () {
+                prevLetter = letter;
+                letter = "I.";
+            }, this, 2, 1, 0); // Keyboard button
+            var oButton = game.add.button(317, game.world.centerY + 60, 'o', function () {
+                prevLetter = letter;
+                letter = "O.";
+            }, this, 2, 1, 0); // Keyboard button
+            var pButton = game.add.button(356, game.world.centerY + 60, 'p', function () {
+                prevLetter = letter;
+                letter = "P.";
+            }, this, 2, 1, 0); // Keyboard button
+            var aButton = game.add.button(22, game.world.centerY + 100, 'a', function () {
+                prevLetter = letter;
+                letter = "A.";
+            }, this, 2, 1, 0); // Keyboard button
+            var sButton = game.add.button(61, game.world.centerY + 100, 's', function () {
+                prevLetter = letter;
+                letter = "S.";
+            }, this, 2, 1, 0); // Keyboard button
+            var dButton = game.add.button(100, game.world.centerY + 100, 'd', function () {
+                prevLetter = letter;
+                letter = "D.";
+            }, this, 2, 1, 0); // Keyboard button
+            var fButton = game.add.button(139, game.world.centerY + 100, 'f', function () {
+                prevLetter = letter;
+                letter = "F.";
+            }, this, 2, 1, 0); // Keyboard button
+            var gButton = game.add.button(178, game.world.centerY + 100, 'g', function () {
+                prevLetter = letter;
+                letter = "G.";
+            }, this, 2, 1, 0); // Keyboard button
+            var hButton = game.add.button(217, game.world.centerY + 100, 'h', function () {
+                prevLetter = letter;
+                letter = "H.";
+            }, this, 2, 1, 0); // Keyboard button
+            var jButton = game.add.button(256, game.world.centerY + 100, 'j', function () {
+                prevLetter = letter;
+                letter = "J.";
+            }, this, 2, 1, 0); // Keyboard button
+            var kButton = game.add.button(295, game.world.centerY + 100, 'k', function () {
+                prevLetter = letter;
+                letter = "K.";
+            }, this, 2, 1, 0); // Keyboard button
+            var lButton = game.add.button(334, game.world.centerY + 100, 'l', function () {
+                prevLetter = letter;
+                letter = "L.";
+            }, this, 2, 1, 0); // Keyboard button
+            var zButton = game.add.button(63, game.world.centerY + 140, 'z', function () {
+                prevLetter = letter;
+                letter = "Z.";
+            }, this, 2, 1, 0); // Keyboard button
+            var xButton = game.add.button(102, game.world.centerY + 140, 'x', function () {
+                prevLetter = letter;
+                letter = "X.";
+            }, this, 2, 1, 0); // Keyboard button
+            var cButton = game.add.button(141, game.world.centerY + 140, 'c', function () {
+                prevLetter = letter;
+                letter = "C.";
+            }, this, 2, 1, 0); // Keyboard button
+            var vButton = game.add.button(180, game.world.centerY + 140, 'v', function () {
+                prevLetter = letter;
+                letter = "V.";
+            }, this, 2, 1, 0); // Keyboard button
+            var bButton = game.add.button(219, game.world.centerY + 140, 'b', function () {
+                prevLetter = letter;
+                letter = "B.";
+            }, this, 2, 1, 0); // Keyboard button
+            var nButton = game.add.button(258, game.world.centerY + 140, 'n', function () {
+                prevLetter = letter;
+                letter = "N.";
+            }, this, 2, 1, 0); // Keyboard button
+            var mButton = game.add.button(297, game.world.centerY + 140, 'm', function () {
+                prevLetter = letter;
+                letter = "M.";
+            }, this, 2, 1, 0); // Keyboard button
+            var entButton = game.add.button(143, game.world.centerY + 180, 'enter', function () {
+                localStorage.setItem(score.toString(), word);
+                game.state.start('leader');
+            }, this, 2, 1, 0); // Enter button
         }
     },
     update: function ()
@@ -624,7 +591,9 @@ var storyState = {
         storyLabel.fill = "#fff"; // White text
         storyLabel.fontSize = 12;
 
-        game.input.onDown.add(function () { game.state.start('main'); }, self); // Input listener to start game on mouse click
+        game.input.onDown.add(function () {
+            game.state.start('main');
+        }, self); // Input listener to start game on mouse click
     }
 };
 
