@@ -111,6 +111,8 @@ var mainState = {
         }
         ;
 
+        this.gameOver = false;
+
         this.deadDrop = game.add.sprite(0, 0, 'deadDroplet'); // Create dead droplet sprite for use when collision occurs
         game.physics.arcade.enable(this.deadDrop); // Add physics to dead droplet
         this.deadDrop.visible = !this.deadDrop.visible; // Make dead droplet invisible until collision occurs
@@ -173,10 +175,12 @@ var mainState = {
             game.state.start('over'); // If the dead droplet is out of the screen, end the game
         }
         game.physics.arcade.overlap(this.droplet, this.oils, this.endGame, null, this); // If the droplet and oil overlap, end the game
-         this.oils.forEach(function(oils) {
-            this.checkScore(oils);
-            this.game.physics.arcade.collide(this.droplet, this.oils, this.endGame, null, this);
-        }, this);
+        if (!this.gameOver) {
+            this.oils.forEach(function (oils) {
+                this.checkScore(oils);
+                this.game.physics.arcade.collide(this.droplet, oils, this.endGame, null, this);
+            }, this);
+        }
     },
     jump: function () // Make the droplet jump 
     {
@@ -186,6 +190,7 @@ var mainState = {
     },
     endGame: function () // End the game
     {
+        this.gameOver = true;
         this.droplet.visible = !this.droplet.visible; // Make droplet invisible while dead droplet is visible
         this.droplet.body.enable = false; // Stop droplet in place
 
@@ -213,7 +218,7 @@ var mainState = {
     },
     addRowOfOils: function ()
     {
-
+        oilGroupnum = 0; //resets group size
         // Randomly pick a number between 1 and 5
         // This will be the hole position
         var hole = Math.floor(Math.random() * 5) + 1;
@@ -223,20 +228,22 @@ var mainState = {
         for (var i = 0; i < 8; i++) {
             if (i !== hole && i !== hole + 1 && i !== hole + 2) {
                 this.addOneOil(400, i * 60 + 10);
+                oilGroupnum++; //keeps track of size of group
             }
         }
 
-        score += 1;
-        this.scoreLabel.text = score;
-        
     },
-    checkScore: function(oils)
+    checkScore: function (oils)
     {
-            if (oils.exists && !oils.hasScored && oils.world.x < 100 ) {
-                    oils.hasScored = true;
-                    score += 1;
-                    this.scoreLabel.text = score;
-                    
+        if (oils.exists && !oils.hasScored && oils.world.x < 100) {
+//            if (this.oils.length % 5 === 0) {
+            oils.hasScored = true;
+            rawscore++;
+            if (oilGroupnum !== 0) {
+                score = rawscore / oilGroupnum;
+            }
+            this.scoreLabel.text = score;
+//            }
         }
     }
 };
@@ -605,7 +612,9 @@ var timer = 0;
 var prevLetter = " ";
 var letter = " ";
 var initials = " ";
-var score = 0;
+var score = 0; //should be final score value per column passed
+var rawscore = 0; //needed to keep score value clean 
+var oilGroupnum = 0; //helps keep track of number of oils per group
 
 game.state.add('main', mainState);
 game.state.add('over', gameOverState);
