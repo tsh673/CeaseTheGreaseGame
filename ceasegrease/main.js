@@ -6,54 +6,54 @@ var mainMusic;
 var jumpSound;
 var deathSound;
 
-var Oil = function (game, x, y, frame) {
-    Phaser.Sprite.call(this, game, x, y, 'oil', frame);
-    this.anchor.setTo(0.5, 0.5);
-    this.game.physics.arcade.enableBody(this);
-
-    this.body.allowGravity = false;
-    this.body.immovable = true;
-
-};
-
-var OilGroup = function (game, parent) {
-    Phaser.Group.call(this, game, parent);
-
-    this.topOil = new Oil(this.game, 400, 0, 0);
-    this.add(this.topOil);
-
-    this.bottomOil = new Oil(this.game, 400, 440, 1);
-    this.add(this.bottomOil);
-
-    this.hasScored = false;
-
-    this.setAll('body.velocity.x', (-200 - (5 * score)));
-};
-
-OilGroup.prototype = Object.create(Phaser.Group.prototype);
-OilGroup.prototype.constructor = OilGroup;
-
-OilGroup.prototype.reset = function (x, y) {
-
-    // Step 1    
-    this.topOil.reset(400, 0);
-
-    // Step 2
-    this.bottomOil.reset(400, 440); // Step 2
-
-    // Step 3
-    this.x = x;
-    this.y = y;
-
-    // Step 4
-    this.setAll('body.velocity.x', (-200 - (5 * score)));
-
-    // Step 5
-    this.hasScored = false;
-
-    // Step 6
-    this.exists = true;
-};
+//var Oil = function (game, x, y, frame) {
+//    Phaser.Sprite.call(this, game, x, y, 'oil', frame);
+//    this.anchor.setTo(0.5, 0.5);
+//    this.game.physics.arcade.enableBody(this);
+//
+//    this.body.allowGravity = false;
+//    this.body.immovable = true;
+//
+//};
+//
+//var OilGroup = function (game, parent) {
+//    Phaser.Group.call(this, game, parent);
+//
+//    this.topOil = new Oil(this.game, 400, 0, 0);
+//    this.add(this.topOil);
+//
+//    this.bottomOil = new Oil(this.game, 400, 440, 1);
+//    this.add(this.bottomOil);
+//
+//    this.hasScored = false;
+//
+//    this.setAll('body.velocity.x', (-200 - (5 * score)));
+//};
+//
+//OilGroup.prototype = Object.create(Phaser.Group.prototype);
+//OilGroup.prototype.constructor = OilGroup;
+//
+//OilGroup.prototype.reset = function (x, y) {
+//
+//    // Step 1    
+//    this.topOil.reset(400, 0);
+//
+//    // Step 2
+//    this.bottomOil.reset(400, 440); // Step 2
+//
+//    // Step 3
+//    this.x = x;
+//    this.y = y;
+//
+//    // Step 4
+//    this.setAll('body.velocity.x', (-200 - (5 * score)));
+//
+//    // Step 5
+//    this.hasScored = false;
+//
+//    // Step 6
+//    this.exists = true;
+//};
 
 var mainState = {
     preload: function ()
@@ -144,11 +144,11 @@ var mainState = {
         //this.oilGenerator = this.game.time.events.loop(1500, this.generateOils, this);
         //this.oilGenerator.timer.start();
 
-        this.score = 0;	// Score initialized to zero and displayed at the top left corner of the screen
-        this.scoreLabel = game.add.text(20, 20, "0");
-        this.scoreLabel.font = "Press Start 2P";
-        this.scoreLabel.fill = "#fff"; // White color
-        this.scoreLabel.fontSize = 30;
+        score = 0;	// Score initialized to zero and displayed at the top left corner of the screen
+        scoreLabel = game.add.text(20, 20, "0");
+        scoreLabel.font = "Press Start 2P";
+        scoreLabel.fill = "#fff"; // White color
+        scoreLabel.fontSize = 30;
 
         mainMusic = game.add.audio('main'); // Music
         jumpSound = game.add.audio('jump'); //Jump sound
@@ -212,7 +212,7 @@ var mainState = {
 
         game.physics.arcade.enable(oil);
 
-        oil.body.velocity.x = -200 - (2*score); // Add velocity to the oil spill to make it move left
+        oil.body.velocity.x = -200 - (2 * score); // Add velocity to the oil spill to make it move left
 
         oil.checkWorldBounds = true;
         oil.outOfBoundsKill = true; // Kill the oil when its out of bounds
@@ -220,16 +220,16 @@ var mainState = {
     addRowOfOils: function ()
     {
         oilGroupnum = 0; //resets group size
-        
+
         // Randomly pick a number between 1 and 5
         // This will be the hole position
         var hole = Math.floor(Math.random() * 5) + 1;
-		
+
         // Add the 6 oils 
         // With one big hole at position 'hole' and 'hole + 1'
         for (var i = 0; i < 8; i++) {
             if (i !== hole && i !== hole + 1 && i !== hole + 2) {
-                this.addOneOil(400, i * 60 + 10);
+                this.addOneOil(400, i * 60);
                 oilGroupnum++; //keeps track of size of group
             }
         }
@@ -238,14 +238,12 @@ var mainState = {
     checkScore: function (oils)
     {
         if (oils.exists && !oils.hasScored && oils.world.x < 100) {
-//            if (this.oils.length % 5 === 0) {
             oils.hasScored = true;
             rawscore++;
             if (oilGroupnum !== 0) {
                 score = rawscore / oilGroupnum;
             }
-            this.scoreLabel.text = score;
-//            }
+            scoreLabel.text = score;
         }
     }
 };
@@ -407,13 +405,13 @@ var scoreState = {
             return false;
         }, this);
 
-        scoreBackground = game.add.sprite(0, 0, 'scoreBackground'); // Add background image
+        this.scoreBackground = game.add.sprite(0, 0, 'scoreBackground'); // Add background image
 
-        scoreLabel = game.add.text(game.world.centerX, game.world.centerY - 55, score); // Score text
-        scoreLabel.anchor.setTo(0.5, 0.5);
-        scoreLabel.font = "Press Start 2P";
-        scoreLabel.fill = "#fff"; // White text
-        scoreLabel.fontSize = 50;
+        this.scoreLabel = game.add.text(game.world.centerX, game.world.centerY - 55, score); // Score text
+        this.scoreLabel.anchor.setTo(0.5, 0.5);
+        this.scoreLabel.font = "Press Start 2P";
+        this.scoreLabel.fill = "#fff"; // White text
+        this.scoreLabel.fontSize = 50;
 
         var scoreButton = game.add.button(game.world.centerX, game.world.centerY + 190, 'scoreButton', getScore, this, 2, 1, 0); // Save score button
         scoreButton.anchor.setTo(0.5, 0.5);
@@ -430,8 +428,8 @@ var scoreState = {
 
         function getScore()
         {
-            scoreBackground.destroy(); // Delete score background image
-            scoreLabel.destroy(); // Delete score 
+            this.scoreBackground.destroy(); // Delete score background image
+            this.scoreLabel.destroy(); // Delete score 
             scoreButton.destroy(); // Delete save score button
             twitterButton.destroy(); // Delete social media buttons
             facebookButton.destroy(); // Delete social media buttons
@@ -570,8 +568,8 @@ var storyState = {
     preload: function ()
     {
         game.load.image('factDroplet', 'assets/droplet/factDroplet1.png'); // Load let's go droplet image
-		game.load.image('quote', 'assets/droplet/quote.png'); // Load quote image
-	},
+        game.load.image('quote', 'assets/droplet/quote.png'); // Load quote image
+    },
     create: function ()
     {
         var storyLabel = game.add.text(game.world.centerX, game.world.centerY - 205, 'Help Drippy reach the ocean!', {fill: 'white', align: 'center', wordWrap: true, wordWrapWidth: 375}); // Story text
@@ -589,25 +587,35 @@ var storyState = {
         instLabel.font = "Press Start 2P";
         instLabel.fontSize = 12;
 
-		quote = game.add.sprite(game.world.centerX, game.world.centerY, 'quote'); // Add quote image
-		quote.anchor.setTo(0.5, 0.5);
-		
-		var fact = Math.floor(Math.random() * 8) + 0;
-		
-		var facts = ["Pouring baking soda into your drain on a monthly basis can help to break up grease blockages.", "Recycled grease and cooking can be recycled into biodiesel fuel!",
-		"Over half of sanitary sewer system overflows result from grease blockages.", "Wipes and other items that don't break down in water can cause just as much damage.",
-		"Houston's sanitary sewer system stretches the distance between Houston and Hawaii!", "Paper towels, baby wipes, and diapers should be thrown in the trash, not flushed.",
-		"Microwaves, bowling balls, carpets, bumpers, heaters, tires, have turned up in our sewers.", "Since 2009, the City of Houston has averaged about 838 sewer overflows per year.",
-		"Waste that clogs Houston’s sewage system cost taxpayers around $2 million annually."];
-		
-		var factLabel = game.add.text(game.world.centerX + 5, game.world.centerY - 25, "Did You Know?\n\n" + facts[fact], { fill: 'black', align: 'center', wordWrap: true, wordWrapWidth: 300 }); // Fact text
+        quote = game.add.sprite(game.world.centerX, game.world.centerY, 'quote'); // Add quote image
+        quote.anchor.setTo(0.5, 0.5);
+
+        var fact = Math.floor(Math.random() * 8) + 0;
+
+        var facts = ["Pouring baking soda into your drain on a monthly basis can help to break up grease blockages.",
+            "Recycled grease and cooking oil can be recycled into biodiesel fuel!",
+            "Over half of sanitary sewer system overflows result from grease blockages.",
+            "Wipes and other items that don't break down in water can cause just as much damage.",
+            "Houston's sanitary sewer system stretches the distance between Houston and Hawaii!",
+            "Paper towels, baby wipes, and diapers should be thrown in the trash, not flushed.",
+            "Microwaves, bowling balls, carpets, bumpers, heaters, and tires have turned up in our sewers.",
+            "Since 2009, the City of Houston has averaged about 838 sewer overflows per year.",
+            "Waste that clogs Houston’s sewage system cost taxpayers around $2 million annually."];
+        if (fact === 8 && oldfact === fact) {//helps prevent repeat facts and loops back to 0
+            fact = 0;
+        } else if (fact === oldfact) { //increments fact number based on repeat
+            fact++;
+        }
+
+        var factLabel = game.add.text(game.world.centerX + 5, game.world.centerY - 25, "Did You Know?\n\n" + facts[fact], {fill: 'black', align: 'center', wordWrap: true, wordWrapWidth: 300}); // Fact text
         factLabel.anchor.setTo(0.5, 0.5);
         factLabel.font = "Press Start 2P";
         factLabel.fontSize = 12;
-	
+        oldfact = fact; //helps prevent repeat facts
+
         factDroplet = game.add.sprite(game.world.centerX, game.world.centerY + 130, 'factDroplet'); // Add fact droplet image
         factDroplet.anchor.setTo(0.5, 0.5);
-		
+
         var storyLabel = game.add.text(game.world.centerX, game.world.centerY + 215, 'Click anywhere to start game'); // Story text
         storyLabel.anchor.setTo(0.5, 0.5);
         storyLabel.font = "Press Start 2P";
@@ -631,7 +639,7 @@ var initials = " ";
 var score = 0; //should be final score value per column passed
 var rawscore = 0; //needed to keep score value clean 
 var oilGroupnum = 0; //helps keep track of number of oils per group
-
+var oldfact = 0;
 game.state.add('main', mainState);
 game.state.add('over', gameOverState);
 game.state.add('menu', menuState);
