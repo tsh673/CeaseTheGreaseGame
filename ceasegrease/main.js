@@ -191,6 +191,7 @@ var mainState = {
     endGame: function () // End the game
     {
         this.gameOver = true;
+        rawscore = 0;
         this.droplet.visible = !this.droplet.visible; // Make droplet invisible while dead droplet is visible
         this.droplet.body.enable = false; // Stop droplet in place
 
@@ -211,7 +212,7 @@ var mainState = {
 
         game.physics.arcade.enable(oil);
 
-        oil.body.velocity.x = -200 /*- (5 * score)*/; // Add velocity to the oil spill to make it move left
+        oil.body.velocity.x = -200 - (2*score); // Add velocity to the oil spill to make it move left
 
         oil.checkWorldBounds = true;
         oil.outOfBoundsKill = true; // Kill the oil when its out of bounds
@@ -219,6 +220,7 @@ var mainState = {
     addRowOfOils: function ()
     {
         oilGroupnum = 0; //resets group size
+        
         // Randomly pick a number between 1 and 5
         // This will be the hole position
         var hole = Math.floor(Math.random() * 5) + 1;
