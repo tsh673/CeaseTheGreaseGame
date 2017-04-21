@@ -217,7 +217,7 @@ var mainState = {
         // Randomly pick a number between 1 and 5
         // This will be the hole position
         var hole = Math.floor(Math.random() * 5) + 1;
-
+		
         // Add the 6 oils 
         // With one big hole at position 'hole' and 'hole + 1'
         for (var i = 0; i < 8; i++) {
@@ -560,32 +560,46 @@ var scoreState = {
 var storyState = {
     preload: function ()
     {
-        game.load.image('factDroplet', 'assets/droplet/factDroplet.png'); // Load let's go droplet image
-    },
+        game.load.image('factDroplet', 'assets/droplet/factDroplet1.png'); // Load let's go droplet image
+		game.load.image('quote', 'assets/droplet/quote.png'); // Load quote image
+	},
     create: function ()
     {
-        var storyLabel = game.add.text(game.world.centerX, game.world.centerY - 200, 'Help Drippy reach the ocean!'); // Story text
+        var storyLabel = game.add.text(game.world.centerX, game.world.centerY - 205, 'Help Drippy reach the ocean!', {fill: 'white', align: 'center', wordWrap: true, wordWrapWidth: 375}); // Story text
         storyLabel.anchor.setTo(0.5, 0.5);
         storyLabel.font = "Press Start 2P";
-        storyLabel.fill = "#fff"; // White text
         storyLabel.fontSize = 12;
 
-        var instructionsLabel = game.add.text(game.world.centerX, game.world.centerY - 175, 'Press SPACEBAR to jump'); // Instructions text
+        var instructionsLabel = game.add.text(game.world.centerX, game.world.centerY - 165, 'Press SPACEBAR to dodge the grease clogs in the pipes', {fill: 'white', align: 'center', wordWrap: true, wordWrapWidth: 375}); // Instructions text
         instructionsLabel.anchor.setTo(0.5, 0.5);
         instructionsLabel.font = "Press Start 2P";
-        instructionsLabel.fill = "#fff"; // White text
         instructionsLabel.fontSize = 12;
 
-        var instLabel = game.add.text(game.world.centerX, game.world.centerY - 150, 'Press ENTER to pause the game'); // Instructions text
+        var instLabel = game.add.text(game.world.centerX, game.world.centerY - 125, 'Press ENTER to pause the game', {fill: 'white', align: 'center', wordWrap: true, wordWrapWidth: 450}); // Instructions text
         instLabel.anchor.setTo(0.5, 0.5);
         instLabel.font = "Press Start 2P";
-        instLabel.fill = "#fff"; // White text
         instLabel.fontSize = 12;
 
-        factDroplet = game.add.sprite(game.world.centerX, game.world.centerY + 25, 'factDroplet'); // Add fact droplet image
+		quote = game.add.sprite(game.world.centerX, game.world.centerY, 'quote'); // Add quote image
+		quote.anchor.setTo(0.5, 0.5);
+		
+		var fact = Math.floor(Math.random() * 8) + 0;
+		
+		var facts = ["Pouring baking soda into your drain on a monthly basis can help to break up grease blockages.", "Recycled grease and cooking can be recycled into biodiesel fuel!",
+		"Over half of sanitary sewer system overflows result from grease blockages.", "Wipes and other items that don't break down in water can cause just as much damage.",
+		"Houston's sanitary sewer system stretches the distance between Houston and Hawaii!", "Paper towels, baby wipes, and diapers should be thrown in the trash, not flushed.",
+		"Microwaves, bowling balls, carpets, bumpers, heaters, tires, have turned up in our sewers.", "Since 2009, the City of Houston has averaged about 838 sewer overflows per year.",
+		"Waste that clogs Houston’s sewage system cost taxpayers around $2 million annually."];
+		
+		var factLabel = game.add.text(game.world.centerX + 5, game.world.centerY - 25, "Did You Know?\n\n" + facts[fact], { fill: 'black', align: 'center', wordWrap: true, wordWrapWidth: 300 }); // Fact text
+        factLabel.anchor.setTo(0.5, 0.5);
+        factLabel.font = "Press Start 2P";
+        factLabel.fontSize = 12;
+	
+        factDroplet = game.add.sprite(game.world.centerX, game.world.centerY + 130, 'factDroplet'); // Add fact droplet image
         factDroplet.anchor.setTo(0.5, 0.5);
-
-        var storyLabel = game.add.text(game.world.centerX, game.world.centerY + 200, 'Click anywhere to start game'); // Story text
+		
+        var storyLabel = game.add.text(game.world.centerX, game.world.centerY + 215, 'Click anywhere to start game'); // Story text
         storyLabel.anchor.setTo(0.5, 0.5);
         storyLabel.font = "Press Start 2P";
         storyLabel.fill = "#fff"; // White text
