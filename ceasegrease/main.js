@@ -251,6 +251,7 @@ var gameOverState = {
     preload: function ()
     {
         game.load.image('gameOverBackground', 'assets/backgrounds/gameOver.png'); // Load game over image
+        game.sound.stopAll();
     },
     create: function ()
     {
@@ -270,8 +271,8 @@ var gameOverState = {
         game.input.onDown.add(function () {
             game.state.start('score');
         }, self); // Input listener go to score screen on mouse click
-		
-		game.sound.stopAll();
+
+        
     },
     update: function ()
     {
