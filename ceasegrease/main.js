@@ -226,14 +226,13 @@ var mainState = {
         var hole = Math.floor(Math.random() * 5) + 1;
 
         // Add the 6 oils 
-        // With one big hole at position 'hole' and 'hole + 1'
+        // With one big hole at position 'hole', 'hole + 1' and 'hole + 2'
         for (var i = 0; i < 8; i++) {
             if (i !== hole && i !== hole + 1 && i !== hole + 2) {
                 this.addOneOil(400, i * 60);
                 oilGroupnum++; //keeps track of size of group
             }
         }
-
     },
     checkScore: function (oils)
     {
