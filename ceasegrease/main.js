@@ -505,8 +505,13 @@ var scoreState = {
                 letter = "M.";
             }, this, 2, 1, 0); // Keyboard button
             var entButton = game.add.button(143, game.world.centerY + 180, 'enter', function () {
-                localStorage.setItem(score.toString(), word);
-                game.state.start('leader');
+				if (word == ""){
+					game.state.start('leader');
+				}
+                else {
+					localStorage.setItem(score.toString(), word);
+					game.state.start('leader');
+				}
             }, this, 2, 1, 0); // Enter button
         }
     },
