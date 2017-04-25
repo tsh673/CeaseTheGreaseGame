@@ -6,54 +6,6 @@ var mainMusic;
 var jumpSound;
 var deathSound;
 
-//var Oil = function (game, x, y, frame) {
-//    Phaser.Sprite.call(this, game, x, y, 'oil', frame);
-//    this.anchor.setTo(0.5, 0.5);
-//    this.game.physics.arcade.enableBody(this);
-//
-//    this.body.allowGravity = false;
-//    this.body.immovable = true;
-//
-//};
-//
-//var OilGroup = function (game, parent) {
-//    Phaser.Group.call(this, game, parent);
-//
-//    this.topOil = new Oil(this.game, 400, 0, 0);
-//    this.add(this.topOil);
-//
-//    this.bottomOil = new Oil(this.game, 400, 440, 1);
-//    this.add(this.bottomOil);
-//
-//    this.hasScored = false;
-//
-//    this.setAll('body.velocity.x', (-200 - (5 * score)));
-//};
-//
-//OilGroup.prototype = Object.create(Phaser.Group.prototype);
-//OilGroup.prototype.constructor = OilGroup;
-//
-//OilGroup.prototype.reset = function (x, y) {
-//
-//    // Step 1    
-//    this.topOil.reset(400, 0);
-//
-//    // Step 2
-//    this.bottomOil.reset(400, 440); // Step 2
-//
-//    // Step 3
-//    this.x = x;
-//    this.y = y;
-//
-//    // Step 4
-//    this.setAll('body.velocity.x', (-200 - (5 * score)));
-//
-//    // Step 5
-//    this.hasScored = false;
-//
-//    // Step 6
-//    this.exists = true;
-//};
 
 var mainState = {
     preload: function ()
@@ -251,7 +203,7 @@ var gameOverState = {
     preload: function ()
     {
         game.load.image('gameOverBackground', 'assets/backgrounds/gameOver.png'); // Load game over image
-        game.sound.stopAll();
+        game.sound.stopAll(); //kills all sound
     },
     create: function ()
     {
