@@ -279,7 +279,7 @@ var gameOverState = {
         timer += game.time.elapsed;
         if (timer >= 500)
         {
-            timer -= 500;
+            timer = 0;
             gameOverLabel.visible = !gameOverLabel.visible;
         }
     }
