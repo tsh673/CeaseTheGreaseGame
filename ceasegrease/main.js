@@ -270,6 +270,8 @@ var gameOverState = {
         game.input.onDown.add(function () {
             game.state.start('score');
         }, self); // Input listener go to score screen on mouse click
+		
+		game.sound.stopAll();
     },
     update: function ()
     {
@@ -400,7 +402,7 @@ var scoreState = {
         twitterButton.endFill();
         twitterButton.inputEnabled = true;
         twitterButton.events.onInputDown.add(function () {
-            var twpopup = window.open("https://twitter.com/intent/tweet?text=Help Trippy Out! http://people.tamu.edu/~valexis22009/ceasegrease/", "pop", "width=600, height=400, scrollbars=no");
+            var twpopup = window.open("https://twitter.com/intent/tweet?text=Help Trippy Out! I dodged " + score + " grease obstacles can you do better? http://people.tamu.edu/~valexis22009/ceasegrease/", "pop", "width=600, height=400, scrollbars=no");
             return false;
         }, this);
 
