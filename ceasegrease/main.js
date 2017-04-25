@@ -212,7 +212,7 @@ var mainState = {
 
         game.physics.arcade.enable(oil);
 
-        oil.body.velocity.x = -200 - (2 * score); // Add velocity to the oil spill to make it move left
+        oil.body.velocity.x = -200 - (5 * score); // Add velocity to the oil spill to make it move left
 
         oil.checkWorldBounds = true;
         oil.outOfBoundsKill = true; // Kill the oil when its out of bounds
