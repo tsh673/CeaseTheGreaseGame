@@ -269,7 +269,7 @@ var leaderboardState = {
             }
         }
         var menuButton = game.add.button(game.world.centerX, game.world.centerY + 200, 'menuButton', function () {
-            game.state.start('menu');
+            game.state.start('links');
         }, this, 2, 1, 0); // Main menu button
         menuButton.anchor.setTo(0.5, 0.5);
     }
@@ -548,7 +548,7 @@ var storyState = {
         quote = game.add.sprite(game.world.centerX, game.world.centerY, 'quote'); // Add quote image
         quote.anchor.setTo(0.5, 0.5);
 
-        var fact = Math.floor(Math.random() * 8) + 0;
+        var fact = Math.floor(Math.random() * (8 - 0 + 1)) + 0;
 	   
         var facts = ["Pouring baking soda into your drain on a monthly basis can help to break up grease blockages.",
             "Recycled grease and cooking oil can be recycled into biodiesel fuel!",
@@ -590,6 +590,55 @@ var storyState = {
     }
 };
 
+var linksState = {
+	preload: function ()
+    {
+        game.load.image('pledgeLink', 'assets/links/pledge.png'); // Load pledge link
+		game.load.image('testLink', 'assets/links/test.png'); // Load test link
+		game.load.image('recycleLink', 'assets/links/recycle.png'); // Load recycle link
+   },
+    create: function ()
+    {
+		game.stage.backgroundColor = 'rgb(1,14,82)'; //Background color blue
+		
+        var link = Math.floor(Math.random() * (2 - 0 + 1)) + 0;
+	   
+        var links = ["Click the link to take our pledge and make our sewers safer for Drippy.",
+            "Click the link to test your knowledge about proper fat, oil, and grease disposal.",
+            "Click the link to find the closest cooking oil recycling center to you."];
+
+        var linkLabel = game.add.text(game.world.centerX + 5, game.world.centerY - 50, links[link], {fill: 'white', align: 'center', wordWrap: true, wordWrapWidth: 385}); // Fact text
+        linkLabel.anchor.setTo(0.5, 0.5);
+        linkLabel.font = "Press Start 2P";
+		linkLabel.fontSize = 12;
+
+        var linksLabel = game.add.text(game.world.centerX, game.world.centerY + 215, 'Press SPACEBAR to go to the Main Menu'); // Return to main menu text
+        linksLabel.anchor.setTo(0.5, 0.5);
+        linksLabel.font = "Press Start 2P";
+        linksLabel.fill = "#fff"; // White text
+        linksLabel.fontSize = 10;
+
+		if (link == 0)
+		{
+			var pledgeButton = game.add.button(game.world.centerX, game.world.centerY, 'pledgeLink', function() { window.location.href = "http://ceasethegrease.net/take-the-pledge/"; }, this);
+			pledgeButton.anchor.setTo(0.5, 0.5);
+		}
+		else if (link == 1)
+		{
+			var testButton = game.add.button(game.world.centerX, game.world.centerY, 'testLink', function() { window.location.href = "https://www.surveymonkey.com/r/ceasethegrease"; }, this);
+			testButton.anchor.setTo(0.5, 0.5);
+		}
+		else
+		{
+			var recycleButton = game.add.button(game.world.centerX, game.world.centerY, 'recycleLink', function() { window.location.href = "http://ceasethegrease.net/recycling/"; }, this);
+			recycleButton.anchor.setTo(0.5, 0.5);
+		}
+		
+		this.space = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+        this.space.onDown.add(function () { game.state.start('menu'); }, self); // Input listener to go to main menu on spacebar 
+	}
+};
+
 var game = new Phaser.Game(400, 490); // Create a 400, 490 new Phaser game
 
 //localStorage.clear();
@@ -602,11 +651,13 @@ var score = 0; //should be final score value per column passed
 var rawscore = 0; //needed to keep score value clean 
 var oilGroupnum = 0; //helps keep track of number of oils per group
 var oldfact = 0;
+
 game.state.add('main', mainState);
 game.state.add('over', gameOverState);
 game.state.add('menu', menuState);
 game.state.add('score', scoreState);
 game.state.add('leader', leaderboardState);
 game.state.add('story', storyState);
+game.state.add('links', linksState);
 
 game.state.start('menu'); // Begin the game at the main menu
