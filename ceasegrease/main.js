@@ -530,7 +530,7 @@ var storyState = {
     },
     create: function ()
     {
-        var storyLabel = game.add.text(game.world.centerX, game.world.centerY - 205, 'Help Drippy reach the ocean!', {fill: 'white', align: 'center', wordWrap: true, wordWrapWidth: 375}); // Story text
+        var storyLabel = game.add.text(game.world.centerX + 7, game.world.centerY - 205, 'Help Drippy reach Galveston Bay!', {fill: 'white', align: 'center', wordWrap: true, wordWrapWidth: 400}); // Story text
         storyLabel.anchor.setTo(0.5, 0.5);
         storyLabel.font = "Press Start 2P";
         storyLabel.fontSize = 12;
@@ -549,11 +549,11 @@ var storyState = {
         quote.anchor.setTo(0.5, 0.5);
 
         var fact = Math.floor(Math.random() * 8) + 0;
-
+	   
         var facts = ["Pouring baking soda into your drain on a monthly basis can help to break up grease blockages.",
             "Recycled grease and cooking oil can be recycled into biodiesel fuel!",
             "Over half of sanitary sewer system overflows result from grease blockages.",
-            "Wipes and other items that don't break down in water can cause just as much damage.",
+            "It’s not just fats, oils, and grease that can cause problems in your pipes. Wipes, paper towels, and other items that don't break down in water can cause just as much damage as fats, oils, and grease do.",
             "Houston's sanitary sewer system stretches the distance between Houston and Hawaii!",
             "Paper towels, baby wipes, and diapers should be thrown in the trash, not flushed.",
             "Microwaves, bowling balls, carpets, bumpers, heaters, and tires have turned up in our sewers.",
@@ -568,7 +568,11 @@ var storyState = {
         var factLabel = game.add.text(game.world.centerX + 5, game.world.centerY - 25, "Did You Know?\n\n" + facts[fact], {fill: 'black', align: 'center', wordWrap: true, wordWrapWidth: 300}); // Fact text
         factLabel.anchor.setTo(0.5, 0.5);
         factLabel.font = "Press Start 2P";
-        factLabel.fontSize = 12;
+        if (fact == 3) {
+			factLabel.fontSize = 8;
+		} else {
+			factLabel.fontSize = 12;
+		}
         oldfact = fact; //helps prevent repeat facts
 
         factDroplet = game.add.sprite(game.world.centerX, game.world.centerY + 130, 'factDroplet'); // Add fact droplet image
