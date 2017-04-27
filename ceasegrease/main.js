@@ -315,7 +315,7 @@ var scoreState = {
     preload: function ()
     {
         game.load.image('scoreBackground', 'assets/backgrounds/score.png'); // Load blank score image
-        game.load.image('saveScoreButton', 'assets/buttons/saveScoreButton.png'); // Load save score button
+        game.load.image('saveScoreButton', 'assets/buttons/saveScoreButton2.png'); // Load save score button
 		game.load.image('playAgainButton', 'assets/buttons/playAgainButton.png'); // Load play again button
         game.load.image('q', 'assets/keyboard/q.png'); // Load alphabet
         game.load.image('w', 'assets/keyboard/w.png'); // Load alphabet
