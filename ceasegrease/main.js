@@ -203,15 +203,23 @@ var gameOverState = {
     preload: function ()
     {
         game.load.image('gameOverBackground', 'assets/backgrounds/gameOver.png'); // Load game over image
-        game.sound.stopAll(); //kills all sound
+        game.load.image('monster', 'assets/grease/monster.png'); // Load grease monster image
+		game.sound.stopAll(); //kills all sound
     },
     create: function ()
     {
         game.stage.backgroundColor = 'rgb(0,0,0)'; //Background color black
 
-        gameOverBackground = game.add.sprite(game.world.centerX, 245, 'gameOverBackground'); // Add game over image
+        gameOverBackground = game.add.sprite(game.world.centerX, 125, 'gameOverBackground'); // Add game over image
         gameOverBackground.anchor.setTo(0.5, 0.5);
 
+		var monster = game.add.sprite(game.world.centerX, game.world.centerY + 80, 'monster');
+
+		monster.anchor.setTo(0.5, 0.5);
+		monster.alpha = 0;
+
+		game.add.tween(monster).to( { alpha: 1 }, 2000, "Linear", true); // Make the grease monster fade in
+		
         timer = 0;
 
         gameOverLabel = game.add.text(game.world.centerX, game.world.centerY + 200, 'Click anywhere to continue'); // Click anywhere to continue text
