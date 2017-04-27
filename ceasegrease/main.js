@@ -6,7 +6,6 @@ var mainMusic;
 var jumpSound;
 var deathSound;
 
-
 var mainState = {
     preload: function ()
     {
@@ -64,12 +63,13 @@ var mainState = {
         ;
 
         this.gameOver = false;
-
         this.deadDrop = game.add.sprite(0, 0, 'deadDroplet'); // Create dead droplet sprite for use when collision occurs
         game.physics.arcade.enable(this.deadDrop); // Add physics to dead droplet
         this.deadDrop.visible = !this.deadDrop.visible; // Make dead droplet invisible until collision occurs
 
         game.physics.startSystem(Phaser.Physics.ARCADE);
+
+        this.oils = game.add.group();
 
         this.droplet = game.add.sprite(100, 245, 'droplet'); // Add droplet sprite at 50,175
         this.droplet.frame = 0; // Default frame is the first frame at position 0
@@ -77,24 +77,26 @@ var mainState = {
         this.droplet.animations.add('jet', [0, 1, 2], 2, true); // Animate the droplet
 
         this.droplet.animations.play('jet'); // Play droplet animation
+        this.droplet.alive = false;
 
         game.physics.arcade.enable(this.droplet); // Add physics to droplet
-
+        this.droplet.body.allowGravity = false;
         this.droplet.body.gravity.y = 1000; // Makes droplet fall 
 
-        // this.oilGenerator = null;
+        this.timer = null;
 
+        //space key
         var spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR); // Jump when spacebar is pressed
         spaceKey.onDown.add(this.jump, this);
+        spaceKey.onDown.addOnce(this.startGame, this);
 
-        var mouseClick = game.input;
+        //mouse click
+        this.game.input.onDown.addOnce(this.startGame, this);
+        this.game.input.onDown.add(this.jump, this.droplet);
 
-        this.oils = game.add.group();
 
-        this.timer = game.time.events.loop(1500, this.addRowOfOils, this);
+        this.game.input.keyboard.addKeyCapture([Phaser.Keyboard.SPACEBAR]);
 
-        //this.oilGenerator = this.game.time.events.loop(1500, this.generateOils, this);
-        //this.oilGenerator.timer.start();
 
         score = 0;	// Score initialized to zero and displayed at the top left corner of the screen
         scoreLabel = game.add.text(20, 20, "0");
@@ -110,6 +112,7 @@ var mainState = {
     },
     update: function () // This function is called 60 times per second
     {
+
         if (this.droplet.y < 0) //resets drippy's upper bound to 0
         {
             this.droplet.y = 0;
@@ -123,7 +126,7 @@ var mainState = {
         {
             this.droplet.destroy(); // Destroy droplet
             this.deadDrop.destroy(); // Destroy dead droplet
-			jumpSound.stop(); // Stop jump music
+            jumpSound.stop(); // Stop jump music
             deathSound.stop(); // Stop death music when dead droplet is off screen 
             game.state.start('over'); // If the dead droplet is out of the screen, end the game
         }
@@ -157,14 +160,22 @@ var mainState = {
         this.deadDrop.body.gravity.y = 500; // Makes dead droplet fall
 
     },
+    startGame: function () {
+        if (!this.droplet.alive && !this.gameover) {
+            this.droplet.body.allowGravity = true;
+            this.droplet.alive = true;
+            // add a timer
+            this.timer = game.time.events.loop(1500, this.addRowOfOils, this);
+        }
+    },
     addOneOil: function (x, y) //need to speed up oil spawn or increase oils on screen
     {
         var oil = game.add.sprite(x, y, 'oil'); // Display oil at x, y
-
+        oil.anchor.setTo(0.5, 0.5);
         this.oils.add(oil);
 
         game.physics.arcade.enable(oil);
-
+        oil.body.allowGravity = false;
         oil.body.velocity.x = -200 - (5 * score); // Add velocity to the oil spill to make it move left
 
         oil.checkWorldBounds = true;
@@ -182,7 +193,7 @@ var mainState = {
         // With one big hole at position 'hole', 'hole + 1' and 'hole + 2'
         for (var i = 0; i < 8; i++) {
             if (i !== hole && i !== hole + 1 && i !== hole + 2) {
-                this.addOneOil(400, i * 60);
+                this.addOneOil(400, i * 60 + 35);
                 oilGroupnum++; //keeps track of size of group
             }
         }
@@ -205,7 +216,7 @@ var gameOverState = {
     {
         game.load.image('gameOverBackground', 'assets/backgrounds/gameOver.png'); // Load game over image
         game.load.image('monster', 'assets/grease/monster.png'); // Load grease monster image
-		game.sound.stopAll(); //kills all sound
+        game.sound.stopAll(); //kills all sound
     },
     create: function ()
     {
@@ -214,13 +225,13 @@ var gameOverState = {
         gameOverBackground = game.add.sprite(game.world.centerX, 125, 'gameOverBackground'); // Add game over image
         gameOverBackground.anchor.setTo(0.5, 0.5);
 
-		var monster = game.add.sprite(game.world.centerX, game.world.centerY + 80, 'monster');
+        var monster = game.add.sprite(game.world.centerX, game.world.centerY + 80, 'monster');
 
-		monster.anchor.setTo(0.5, 0.5);
-		monster.alpha = 0;
+        monster.anchor.setTo(0.5, 0.5);
+        monster.alpha = 0;
 
-		game.add.tween(monster).to( { alpha: 1 }, 2000, "Linear", true); // Make the grease monster fade in
-		
+        game.add.tween(monster).to({alpha: 1}, 2000, "Linear", true); // Make the grease monster fade in
+
         timer = 0;
 
         gameOverLabel = game.add.text(game.world.centerX, game.world.centerY + 200, 'Click anywhere to continue'); // Click anywhere to continue text
@@ -316,7 +327,7 @@ var scoreState = {
     {
         game.load.image('scoreBackground', 'assets/backgrounds/score.png'); // Load blank score image
         game.load.image('saveScoreButton', 'assets/buttons/saveScoreButton2.png'); // Load save score button
-		game.load.image('playAgainButton', 'assets/buttons/playAgainButton.png'); // Load play again button
+        game.load.image('playAgainButton', 'assets/buttons/playAgainButton.png'); // Load play again button
         game.load.image('q', 'assets/keyboard/q.png'); // Load alphabet
         game.load.image('w', 'assets/keyboard/w.png'); // Load alphabet
         game.load.image('e', 'assets/keyboard/e.png'); // Load alphabet
@@ -380,9 +391,11 @@ var scoreState = {
         var saveScoreButton = game.add.button(game.world.centerX, game.world.centerY + 165, 'saveScoreButton', getScore, this, 2, 1, 0); // Save score button
         saveScoreButton.anchor.setTo(0.5, 0.5);
 
-		var playAgainButton = game.add.button(game.world.centerX, game.world.centerY + 210, 'playAgainButton', function () { game.state.start('main'); }, this, 2, 1, 0); // Play again button
+        var playAgainButton = game.add.button(game.world.centerX, game.world.centerY + 210, 'playAgainButton', function () {
+            game.state.start('main');
+        }, this, 2, 1, 0); // Play again button
         playAgainButton.anchor.setTo(0.5, 0.5);
-		
+
         word = "";
         prevLetter = "";
         letter = "";
@@ -398,7 +411,7 @@ var scoreState = {
             this.scoreBackground.destroy(); // Delete score background image
             this.scoreLabel.destroy(); // Delete score 
             saveScoreButton.destroy(); // Delete save score button
-			playAgainButton.destroy(); // Delete play again button
+            playAgainButton.destroy(); // Delete play again button
             twitterButton.destroy(); // Delete social media buttons
             facebookButton.destroy(); // Delete social media buttons
 
@@ -563,7 +576,7 @@ var storyState = {
         quote.anchor.setTo(0.5, 0.5);
 
         var fact = Math.floor(Math.random() * (8 - 0 + 1)) + 0;
-	   
+
         var facts = ["Pouring baking soda into your drain on a monthly basis can help to break up grease blockages.",
             "Recycled grease and cooking oil can be recycled into biodiesel fuel!",
             "Over half of sanitary sewer system overflows result from grease blockages.",
@@ -582,11 +595,11 @@ var storyState = {
         var factLabel = game.add.text(game.world.centerX + 5, game.world.centerY - 25, "Did You Know?\n\n" + facts[fact], {fill: 'black', align: 'center', wordWrap: true, wordWrapWidth: 300}); // Fact text
         factLabel.anchor.setTo(0.5, 0.5);
         factLabel.font = "Press Start 2P";
-        if (fact == 3) {
-			factLabel.fontSize = 8;
-		} else {
-			factLabel.fontSize = 12;
-		}
+        if (fact === 3) {
+            factLabel.fontSize = 8;
+        } else {
+            factLabel.fontSize = 12;
+        }
         oldfact = fact; //helps prevent repeat facts
 
         factDroplet = game.add.sprite(game.world.centerX, game.world.centerY + 130, 'factDroplet'); // Add fact droplet image
@@ -605,19 +618,19 @@ var storyState = {
 };
 
 var linksState = {
-	preload: function ()
+    preload: function ()
     {
         game.load.image('pledgeLink', 'assets/links/pledge.png'); // Load pledge link
-		game.load.image('testLink', 'assets/links/test.png'); // Load test link
-		game.load.image('recycleLink', 'assets/links/recycle.png'); // Load recycle link
-		game.load.image('mainMenuButton', 'assets/buttons/mainMenuButton.png'); // Load main menu button
-	},
+        game.load.image('testLink', 'assets/links/test.png'); // Load test link
+        game.load.image('recycleLink', 'assets/links/recycle.png'); // Load recycle link
+        game.load.image('mainMenuButton', 'assets/buttons/mainMenuButton.png'); // Load main menu button
+    },
     create: function ()
     {
-		game.stage.backgroundColor = 'rgb(1,14,82)'; //Background color blue
-		
+        game.stage.backgroundColor = 'rgb(1,14,82)'; //Background color blue
+
         var link = Math.floor(Math.random() * (2 - 0 + 1)) + 0;
-	   
+
         var links = ["Click the link to take our pledge and make our sewers safer for Drippy.",
             "Click the link to test your knowledge about proper fat, oil, and grease disposal.",
             "Click the link to find the closest cooking oil recycling center to you."];
@@ -625,28 +638,35 @@ var linksState = {
         var linkLabel = game.add.text(game.world.centerX + 5, game.world.centerY - 50, links[link], {fill: 'white', align: 'center', wordWrap: true, wordWrapWidth: 385}); // Fact text
         linkLabel.anchor.setTo(0.5, 0.5);
         linkLabel.font = "Press Start 2P";
-		linkLabel.fontSize = 12;
+        linkLabel.fontSize = 12;
 
-		if (link == 0)
-		{
-			var pledgeButton = game.add.button(game.world.centerX, game.world.centerY, 'pledgeLink', function() { window.location.href = "http://ceasethegrease.net/take-the-pledge/"; }, this);
-			pledgeButton.anchor.setTo(0.5, 0.5);
-		}
-		else if (link == 1)
-		{
-			var testButton = game.add.button(game.world.centerX, game.world.centerY, 'testLink', function() { window.location.href = "https://www.surveymonkey.com/r/ceasethegrease"; }, this);
-			testButton.anchor.setTo(0.5, 0.5);
-		}
-		else
-		{
-			var recycleButton = game.add.button(game.world.centerX, game.world.centerY, 'recycleLink', function() { window.location.href = "http://ceasethegrease.net/recycling/"; }, this);
-			recycleButton.anchor.setTo(0.5, 0.5);
-		}
-		
-		var mainMenuButton = game.add.button(game.world.centerX, game.world.centerY + 200, 'mainMenuButton', function () { game.state.start('menu'); }, this, 2, 1, 0); // Main menu button
+        if (link === 0)
+        {
+            var pledgeButton = game.add.button(game.world.centerX, game.world.centerY, 'pledgeLink', function () {
+                window.location.href = "http://ceasethegrease.net/take-the-pledge/";
+            }, this);
+            pledgeButton.anchor.setTo(0.5, 0.5);
+        } else if (link === 1)
+        {
+            var testButton = game.add.button(game.world.centerX, game.world.centerY, 'testLink', function () {
+                window.location.href = "https://www.surveymonkey.com/r/ceasethegrease";
+            }, this);
+            testButton.anchor.setTo(0.5, 0.5);
+        } else
+        {
+            var recycleButton = game.add.button(game.world.centerX, game.world.centerY, 'recycleLink', function () {
+                window.location.href = "http://ceasethegrease.net/recycling/";
+            }, this);
+            recycleButton.anchor.setTo(0.5, 0.5);
+        }
+
+        var mainMenuButton = game.add.button(game.world.centerX, game.world.centerY + 200, 'mainMenuButton', function () {
+            game.state.start('menu');
+        }, this, 2, 1, 0); // Main menu button
         mainMenuButton.anchor.setTo(0.5, 0.5);
-	}
+    }
 };
+
 
 var game = new Phaser.Game(400, 490); // Create a 400, 490 new Phaser game
 
