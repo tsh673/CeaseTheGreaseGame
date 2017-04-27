@@ -123,6 +123,7 @@ var mainState = {
         {
             this.droplet.destroy(); // Destroy droplet
             this.deadDrop.destroy(); // Destroy dead droplet
+			jumpSound.stop(); // Stop jump music
             deathSound.stop(); // Stop death music when dead droplet is off screen 
             game.state.start('over'); // If the dead droplet is out of the screen, end the game
         }
