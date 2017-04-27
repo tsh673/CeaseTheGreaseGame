@@ -315,7 +315,7 @@ var scoreState = {
     preload: function ()
     {
         game.load.image('scoreBackground', 'assets/backgrounds/score.png'); // Load blank score image
-        game.load.image('saveScoreButton', 'assets/buttons/saveScoreButton2.png'); // Load save score button
+        game.load.image('saveScoreButton', 'assets/buttons/saveScoreButton.png'); // Load save score button
 		game.load.image('playAgainButton', 'assets/buttons/playAgainButton.png'); // Load play again button
         game.load.image('q', 'assets/keyboard/q.png'); // Load alphabet
         game.load.image('w', 'assets/keyboard/w.png'); // Load alphabet
@@ -377,8 +377,8 @@ var scoreState = {
         this.scoreLabel.fill = "#fff"; // White text
         this.scoreLabel.fontSize = 50;
 
-        var saveScoreButton = game.add.button(game.world.centerX, game.world.centerY + 165, 'saveScoreButton', getScore, this, 2, 1, 0); // Save score button
-        saveScoreButton.anchor.setTo(0.5, 0.5);
+        var scoreButton = game.add.button(game.world.centerX, game.world.centerY + 165, 'saveScoreButton', getScore, this, 2, 1, 0); // Save score button
+        scoreButton.anchor.setTo(0.5, 0.5);
 
 		var playAgainButton = game.add.button(game.world.centerX, game.world.centerY + 210, 'playAgainButton', function () { game.state.start('main'); }, this, 2, 1, 0); // Play again button
         playAgainButton.anchor.setTo(0.5, 0.5);
@@ -397,7 +397,7 @@ var scoreState = {
         {
             this.scoreBackground.destroy(); // Delete score background image
             this.scoreLabel.destroy(); // Delete score 
-            saveScoreButton.destroy(); // Delete save score button
+            scoreButton.destroy(); // Delete save score button
 			playAgainButton.destroy(); // Delete play again button
             twitterButton.destroy(); // Delete social media buttons
             facebookButton.destroy(); // Delete social media buttons
