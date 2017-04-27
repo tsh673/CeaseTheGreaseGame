@@ -364,7 +364,7 @@ var scoreState = {
         twitterButton.endFill();
         twitterButton.inputEnabled = true;
         twitterButton.events.onInputDown.add(function () {
-            var twpopup = window.open("https://twitter.com/intent/tweet?text=Help Trippy Out! I dodged " + score + " grease obstacles can you do better? http://people.tamu.edu/~valexis22009/ceasegrease/", "pop", "width=600, height=400, scrollbars=no");
+            var twpopup = window.open("https://twitter.com/intent/tweet?text=Help Drippy get to the Bay! I dodged " + score + " grease blockages, can you do better? http://people.tamu.edu/~valexis22009/ceasegrease/", "pop", "width=600, height=400, scrollbars=no");
             return false;
         }, this);
 
