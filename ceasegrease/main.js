@@ -249,7 +249,7 @@ var gameOverState = {
 var leaderboardState = {
     preload: function ()
     {
-        game.load.image('menuButton', 'assets/buttons/menuButton.png'); // Load main menu image
+        game.load.image('continueButton', 'assets/buttons/continueButton.png'); // Load main menu image
         game.load.image('highScores', 'assets/backgrounds/highScores.png'); // Load high score image
     },
     create: function ()
@@ -276,10 +276,10 @@ var leaderboardState = {
                 scoresLabel.fontSize = 15;
             }
         }
-        var menuButton = game.add.button(game.world.centerX, game.world.centerY + 200, 'menuButton', function () {
+        var continueButton = game.add.button(game.world.centerX, game.world.centerY + 200, 'continueButton', function () {
             game.state.start('links');
         }, this, 2, 1, 0); // Main menu button
-        menuButton.anchor.setTo(0.5, 0.5);
+        continueButton.anchor.setTo(0.5, 0.5);
     }
 };
 
@@ -314,7 +314,8 @@ var scoreState = {
     preload: function ()
     {
         game.load.image('scoreBackground', 'assets/backgrounds/score.png'); // Load blank score image
-        game.load.image('scoreButton', 'assets/buttons/scoreButton.png'); // Load save score button
+        game.load.image('saveScoreButton', 'assets/buttons/saveScoreButton.png'); // Load save score button
+		game.load.image('playAgainButton', 'assets/buttons/playAgainButton.png'); // Load play again button
         game.load.image('q', 'assets/keyboard/q.png'); // Load alphabet
         game.load.image('w', 'assets/keyboard/w.png'); // Load alphabet
         game.load.image('e', 'assets/keyboard/e.png'); // Load alphabet
@@ -375,9 +376,12 @@ var scoreState = {
         this.scoreLabel.fill = "#fff"; // White text
         this.scoreLabel.fontSize = 50;
 
-        var scoreButton = game.add.button(game.world.centerX, game.world.centerY + 190, 'scoreButton', getScore, this, 2, 1, 0); // Save score button
+        var scoreButton = game.add.button(game.world.centerX, game.world.centerY + 165, 'saveScoreButton', getScore, this, 2, 1, 0); // Save score button
         scoreButton.anchor.setTo(0.5, 0.5);
 
+		var playAgainButton = game.add.button(game.world.centerX, game.world.centerY + 210, 'playAgainButton', function () { game.state.start('main'); }, this, 2, 1, 0); // Play again button
+        playAgainButton.anchor.setTo(0.5, 0.5);
+		
         word = "";
         prevLetter = "";
         letter = "";
@@ -393,6 +397,7 @@ var scoreState = {
             this.scoreBackground.destroy(); // Delete score background image
             this.scoreLabel.destroy(); // Delete score 
             scoreButton.destroy(); // Delete save score button
+			playAgainButton.destroy(); // Delete play again button
             twitterButton.destroy(); // Delete social media buttons
             facebookButton.destroy(); // Delete social media buttons
 
@@ -604,7 +609,8 @@ var linksState = {
         game.load.image('pledgeLink', 'assets/links/pledge.png'); // Load pledge link
 		game.load.image('testLink', 'assets/links/test.png'); // Load test link
 		game.load.image('recycleLink', 'assets/links/recycle.png'); // Load recycle link
-   },
+		game.load.image('mainMenuButton', 'assets/buttons/mainMenuButton.png'); // Load main menu button
+	},
     create: function ()
     {
 		game.stage.backgroundColor = 'rgb(1,14,82)'; //Background color blue
@@ -619,12 +625,6 @@ var linksState = {
         linkLabel.anchor.setTo(0.5, 0.5);
         linkLabel.font = "Press Start 2P";
 		linkLabel.fontSize = 12;
-
-        var linksLabel = game.add.text(game.world.centerX, game.world.centerY + 215, 'Press SPACEBAR to go to the Main Menu'); // Return to main menu text
-        linksLabel.anchor.setTo(0.5, 0.5);
-        linksLabel.font = "Press Start 2P";
-        linksLabel.fill = "#fff"; // White text
-        linksLabel.fontSize = 10;
 
 		if (link == 0)
 		{
@@ -642,8 +642,8 @@ var linksState = {
 			recycleButton.anchor.setTo(0.5, 0.5);
 		}
 		
-		this.space = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-        this.space.onDown.add(function () { game.state.start('menu'); }, self); // Input listener to go to main menu on spacebar 
+		var mainMenuButton = game.add.button(game.world.centerX, game.world.centerY + 200, 'mainMenuButton', function () { game.state.start('menu'); }, this, 2, 1, 0); // Main menu button
+        mainMenuButton.anchor.setTo(0.5, 0.5);
 	}
 };
 
