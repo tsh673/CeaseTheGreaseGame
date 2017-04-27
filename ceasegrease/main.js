@@ -644,7 +644,6 @@ var linksState = {
 		
 		this.space = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
         this.space.onDown.add(function () { game.state.start('menu'); }, self); // Input listener to go to main menu on spacebar 
-		game.input.onDown.add(function () { game.state.start('menu'); }, self); // Input listener to go to main menu on click/tap
 	}
 };
 
