@@ -85,11 +85,8 @@ var mainState = {
 
         this.timer = null;
 
-		this.instructionsLabel = game.add.text(game.world.centerX + 5, game.world.centerY - 100, 'Press SPACEBAR or CLICK to dodge the grease clogs in the pipes', {fill: 'white', align: 'center', wordWrap: true, wordWrapWidth: 375}); // Instructions text
-        this.instructionsLabel.anchor.setTo(0.5, 0.5);
-        this.instructionsLabel.font = "Press Start 2P";
-        this.instructionsLabel.fontSize = 15;
-		
+        
+
         //space key
         var spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR); // Jump when spacebar is pressed
         spaceKey.onDown.add(this.jump, this);
@@ -102,6 +99,11 @@ var mainState = {
 
         this.game.input.keyboard.addKeyCapture([Phaser.Keyboard.SPACEBAR]);
 
+        //tells user to press space or click 
+        this.instructionsLabel = game.add.text(game.world.centerX + 5, game.world.centerY - 100, 'Press SPACEBAR or CLICK to dodge the grease clogs in the pipes', {fill: 'white', align: 'center', wordWrap: true, wordWrapWidth: 375}); // Instructions text
+        this.instructionsLabel.anchor.setTo(0.5, 0.5);
+        this.instructionsLabel.font = "Press Start 2P";
+        this.instructionsLabel.fontSize = 15;
 
         score = 0;	// Score initialized to zero and displayed at the top left corner of the screen
         scoreLabel = game.add.text(20, 20, "0");
@@ -167,11 +169,13 @@ var mainState = {
     },
     startGame: function () {
         if (!this.droplet.alive && !this.gameover) {
-			this.droplet.body.allowGravity = true;
+            this.droplet.body.allowGravity = true;
             this.droplet.alive = true;
-			this.instructionsLabel.destroy();
+
             // add a timer
             this.timer = game.time.events.loop(1500, this.addRowOfOils, this);
+            //kills the game start instruction text
+            this.instructionsLabel.destroy();
         }
     },
     addOneOil: function (x, y) //need to speed up oil spawn or increase oils on screen
