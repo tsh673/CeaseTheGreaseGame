@@ -71,7 +71,7 @@ var mainState = {
 
         this.oils = game.add.group();
 
-        this.droplet = game.add.sprite(100, 245, 'droplet'); // Add droplet sprite at 50,175
+        this.droplet = game.add.sprite(175, 245, 'droplet'); // Add droplet sprite at 50,175
         this.droplet.frame = 0; // Default frame is the first frame at position 0
 
         this.droplet.animations.add('jet', [0, 1, 2], 2, true); // Animate the droplet
@@ -85,6 +85,11 @@ var mainState = {
 
         this.timer = null;
 
+		this.instructionsLabel = game.add.text(game.world.centerX + 5, game.world.centerY - 100, 'Press SPACEBAR or CLICK to dodge the grease clogs in the pipes', {fill: 'white', align: 'center', wordWrap: true, wordWrapWidth: 375}); // Instructions text
+        this.instructionsLabel.anchor.setTo(0.5, 0.5);
+        this.instructionsLabel.font = "Press Start 2P";
+        this.instructionsLabel.fontSize = 15;
+		
         //space key
         var spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR); // Jump when spacebar is pressed
         spaceKey.onDown.add(this.jump, this);
@@ -162,8 +167,9 @@ var mainState = {
     },
     startGame: function () {
         if (!this.droplet.alive && !this.gameover) {
-            this.droplet.body.allowGravity = true;
+			this.droplet.body.allowGravity = true;
             this.droplet.alive = true;
+			this.instructionsLabel.destroy();
             // add a timer
             this.timer = game.time.events.loop(1500, this.addRowOfOils, this);
         }
@@ -557,15 +563,10 @@ var storyState = {
     },
     create: function ()
     {
-        var storyLabel = game.add.text(game.world.centerX + 7, game.world.centerY - 205, 'Help Drippy reach Galveston Bay!', {fill: 'white', align: 'center', wordWrap: true, wordWrapWidth: 400}); // Story text
+        var storyLabel = game.add.text(game.world.centerX + 7, game.world.centerY - 180, 'Help Drippy dodge the grease clogs in the pipes to get home to Galveston Bay safely!', {fill: 'white', align: 'center', wordWrap: true, wordWrapWidth: 375}); // Story text
         storyLabel.anchor.setTo(0.5, 0.5);
         storyLabel.font = "Press Start 2P";
         storyLabel.fontSize = 12;
-
-        var instructionsLabel = game.add.text(game.world.centerX, game.world.centerY - 165, 'Press SPACEBAR to dodge the grease clogs in the pipes', {fill: 'white', align: 'center', wordWrap: true, wordWrapWidth: 375}); // Instructions text
-        instructionsLabel.anchor.setTo(0.5, 0.5);
-        instructionsLabel.font = "Press Start 2P";
-        instructionsLabel.fontSize = 12;
 
         var instLabel = game.add.text(game.world.centerX, game.world.centerY - 125, 'Press ENTER to pause the game', {fill: 'white', align: 'center', wordWrap: true, wordWrapWidth: 450}); // Instructions text
         instLabel.anchor.setTo(0.5, 0.5);
@@ -635,7 +636,7 @@ var linksState = {
             "Click the link to test your knowledge about proper fat, oil, and grease disposal.",
             "Click the link to find the closest cooking oil recycling center to you."];
 
-        var linkLabel = game.add.text(game.world.centerX + 5, game.world.centerY - 50, links[link], {fill: 'white', align: 'center', wordWrap: true, wordWrapWidth: 385}); // Fact text
+        var linkLabel = game.add.text(game.world.centerX + 5, game.world.centerY - 50, links[link], {fill: 'white', align: 'center', wordWrap: true, wordWrapWidth: 375}); // Links text
         linkLabel.anchor.setTo(0.5, 0.5);
         linkLabel.font = "Press Start 2P";
         linkLabel.fontSize = 12;
