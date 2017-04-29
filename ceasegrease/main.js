@@ -438,6 +438,7 @@ var scoreState = {
             enterLabel.fill = "rgb(182,145,35)"; // Tan text
             enterLabel.fontSize = 12;
 
+			// Custom keyboard click functionality
             var qButton = game.add.button(5, game.world.centerY + 60, 'q', function () {
                 prevLetter = letter;
                 letter = "Q.";
@@ -550,7 +551,33 @@ var scoreState = {
                     game.state.start('leader');
                 }
             }, this, 2, 1, 0); // Enter button
-        }
+			
+			//Keyboard functionality
+			game.input.keyboard.addCallbacks(self, keyDown, null, null); // Input listener for user's keyboard input 
+
+            function keyDown(evt)
+            {
+                if (evt.which < "A".charCodeAt(0) || evt.which > "Z".charCodeAt(0))
+                    return; // Skip it unless it's a-z.
+
+                prevLetter = letter; // Save previous letter
+
+                letter = String.fromCharCode(evt.which) + "."; // Add period for initials format ex: t.h.
+
+                if (!evt.shiftKey)
+                    letter = letter.toUpperCase();
+            }
+
+            this.enter2 = game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
+            this.enter2.onDown.add(function () { // When the enter key is pressed
+                if (word === "") {
+                    game.state.start('leader');
+                } else {
+                    localStorage.setItem(score.toString(), word);
+                    game.state.start('leader');
+                }
+			}, this);
+		}
     },
     update: function ()
     {
