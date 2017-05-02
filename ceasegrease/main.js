@@ -91,14 +91,13 @@ var mainState = {
         var spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR); // Jump when spacebar is pressed
         spaceKey.onDown.add(this.jump, this);
         spaceKey.onDown.addOnce(this.startGame, this);
-
+        this.game.input.keyboard.addKeyCapture([Phaser.Keyboard.SPACEBAR]);
+        
         //mouse click
         var mouseClick = this.game.input;
         mouseClick.onDown.addOnce(this.startGame, this);
         mouseClick.onDown.add(this.jump, this);
       
-
-        this.game.input.keyboard.addKeyCapture([Phaser.Keyboard.SPACEBAR]);
 
         //tells user to press space or click 
         this.instructionsLabel = game.add.text(game.world.centerX + 5, game.world.centerY - 100, 'Press SPACEBAR or CLICK to dodge the grease clogs in the pipes', {fill: 'white', align: 'center', wordWrap: true, wordWrapWidth: 375}); // Instructions text
