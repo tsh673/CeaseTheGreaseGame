@@ -93,9 +93,9 @@ var mainState = {
         spaceKey.onDown.addOnce(this.startGame, this);
 
         //mouse click
-     
-        this.game.input.onDown.addOnce(this.startGame, this);
-        this.game.input.onDown.add(this.jump, this.droplet);
+        var mouseClick = game.input;
+        mouseClick.onDown.addOnce(this.startGame, this);
+        mouseClick.onDown.add(this.jump, this);
       
 
         this.game.input.keyboard.addKeyCapture([Phaser.Keyboard.SPACEBAR]);
