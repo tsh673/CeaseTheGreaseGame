@@ -88,15 +88,15 @@ var mainState = {
         
 
         //space key
-        var spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR); // Jump when spacebar is pressed
+        var spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR); // Jump when spacebar is pressed
         spaceKey.onDown.add(this.jump, this);
         spaceKey.onDown.addOnce(this.startGame, this);
         this.game.input.keyboard.addKeyCapture([Phaser.Keyboard.SPACEBAR]);
         
         //mouse click
-        var mouseClick = game.input;
-        mouseClick.onTap.add(this.jump, this);
-        mouseClick.onTap.addOnce(this.startGame, this);
+        var mouseClick = this.game.input;
+        mouseClick.onDown.add(this.jump, this);
+        mouseClick.onDown.addOnce(this.startGame, this);
        
       
 
