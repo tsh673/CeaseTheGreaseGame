@@ -95,8 +95,9 @@ var mainState = {
         
         //mouse click
         var mouseClick = this.game.input;
-        mouseClick.onDown.addOnce(this.startGame, this);
         mouseClick.onDown.add(this.jump, this);
+        mouseClick.onDown.addOnce(this.startGame, this);
+       
       
 
         //tells user to press space or click 
