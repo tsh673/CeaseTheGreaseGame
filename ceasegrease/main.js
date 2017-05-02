@@ -93,7 +93,7 @@ var mainState = {
         spaceKey.onDown.addOnce(this.startGame, this);
 
         //mouse click
-        var mouseClick = game.input;
+        var mouseClick = this.game.input;
         mouseClick.onDown.addOnce(this.startGame, this);
         mouseClick.onDown.add(this.jump, this);
       
