@@ -85,20 +85,20 @@ var mainState = {
 
         this.timer = null;
 
-        
+        this.air = false;
 
         //space key
         var spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR); // Jump when spacebar is pressed
         spaceKey.onDown.add(this.jump, this);
         spaceKey.onDown.addOnce(this.startGame, this);
         this.game.input.keyboard.addKeyCapture([Phaser.Keyboard.SPACEBAR]);
-        
+
         //mouse click
-        var mouseClick = this.game.input;
+        var mouseClick = game.input;
 //        mouseClick.onDown.add(this.jump, this);
         mouseClick.onDown.addOnce(this.startGame, this);
-       
-      
+
+
 
         //tells user to press space or click 
         this.instructionsLabel = game.add.text(game.world.centerX + 5, game.world.centerY - 100, 'Press SPACEBAR or CLICK to dodge the grease clogs in the pipes', {fill: 'white', align: 'center', wordWrap: true, wordWrapWidth: 375}); // Instructions text
@@ -148,9 +148,11 @@ var mainState = {
     },
     jump: function () // Make the droplet jump 
     {
-        jumpSound.stop();
-        jumpSound.play();
-        this.droplet.body.velocity.y = -350; // Add a vertical velocity to the droplet
+        if (this.air) {
+            jumpSound.stop();
+            jumpSound.play();
+            this.droplet.body.velocity.y = -350; // Add a vertical velocity to the droplet
+        }
     },
     endGame: function () // End the game
     {
@@ -169,10 +171,10 @@ var mainState = {
 
     },
     startGame: function () {
-        if (!this.droplet.alive && !this.gameover) {
+        if (!this.droplet.alive && !this.gameover && !this.air) {
             this.droplet.body.allowGravity = true;
             this.droplet.alive = true;
-
+            this.air = true;
             // add a timer
             this.timer = game.time.events.loop(1500, this.addRowOfOils, this);
             //kills the game start instruction text
@@ -438,7 +440,7 @@ var scoreState = {
             enterLabel.fill = "rgb(182,145,35)"; // Tan text
             enterLabel.fontSize = 12;
 
-			// Custom keyboard click functionality
+            // Custom keyboard click functionality
             var qButton = game.add.button(5, game.world.centerY + 60, 'q', function () {
                 prevLetter = letter;
                 letter = "Q.";
@@ -551,9 +553,9 @@ var scoreState = {
                     game.state.start('leader');
                 }
             }, this, 2, 1, 0); // Enter button
-			
-			//Keyboard functionality
-			game.input.keyboard.addCallbacks(self, keyDown, null, null); // Input listener for user's keyboard input 
+
+            //Keyboard functionality
+            game.input.keyboard.addCallbacks(self, keyDown, null, null); // Input listener for user's keyboard input 
 
             function keyDown(evt)
             {
@@ -576,8 +578,8 @@ var scoreState = {
                     localStorage.setItem(score.toString(), word);
                     game.state.start('leader');
                 }
-			}, this);
-		}
+            }, this);
+        }
     },
     update: function ()
     {
