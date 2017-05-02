@@ -94,9 +94,9 @@ var mainState = {
         this.game.input.keyboard.addKeyCapture([Phaser.Keyboard.SPACEBAR]);
         
         //mouse click
-        var mouseClick = this.game.input;
-        mouseClick.onDown.add(this.jump, this);
-        mouseClick.onDown.addOnce(this.startGame, this);
+        var mouseClick = game.input;
+        mouseClick.onTap.add(this.jump, this);
+        mouseClick.onTap.addOnce(this.startGame, this);
        
       
 
