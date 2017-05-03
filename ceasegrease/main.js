@@ -5,6 +5,7 @@
 var mainMusic;
 var jumpSound;
 var deathSound;
+var socialMediaLink = "ceasethegrease.net"; //Change this for social media to link somewhere else
 
 var mainState = {
     preload: function ()
@@ -378,7 +379,7 @@ var scoreState = {
         facebookButton.endFill();
         facebookButton.inputEnabled = true;
         facebookButton.events.onInputDown.add(function () {
-            var fbpopup = window.open("https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fpeople.tamu.edu%2F%7Evalexis22009%2Fceasegrease%2F&amp", "pop", "width=600, height=400, scrollbars=no");
+            var fbpopup = window.open("https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2F" + socialMediaLink, "pop", "width=600, height=400, scrollbars=no");
             return false;
         }, this);
 
@@ -389,7 +390,7 @@ var scoreState = {
         twitterButton.endFill();
         twitterButton.inputEnabled = true;
         twitterButton.events.onInputDown.add(function () {
-            var twpopup = window.open("https://twitter.com/intent/tweet?text=Help Drippy get to the Bay! I dodged " + score + " grease blockages, can you do better? http://people.tamu.edu/~valexis22009/ceasegrease/", "pop", "width=600, height=400, scrollbars=no");
+            var twpopup = window.open("https://twitter.com/intent/tweet?text=Help Drippy get to the Bay! I dodged " + score + " grease blockages, can you do better? http://" + socialMediaLink, "pop", "width=600, height=400, scrollbars=no");
             return false;
         }, this);
 
