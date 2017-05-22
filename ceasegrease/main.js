@@ -679,19 +679,19 @@ var linksState = {
         if (link === 0)
         {
             var pledgeButton = game.add.button(game.world.centerX, game.world.centerY, 'pledgeLink', function () {
-                window.location.href = "http://ceasethegrease.net/take-the-pledge/";
+                window.open('http://ceasethegrease.net/take-the-pledge/','_blank');
             }, this);
             pledgeButton.anchor.setTo(0.5, 0.5);
         } else if (link === 1)
         {
             var testButton = game.add.button(game.world.centerX, game.world.centerY, 'testLink', function () {
-                window.location.href = "https://www.surveymonkey.com/r/ceasethegrease";
+                window.open('https://www.surveymonkey.com/r/ceasethegrease','_blank');
             }, this);
             testButton.anchor.setTo(0.5, 0.5);
         } else
         {
             var recycleButton = game.add.button(game.world.centerX, game.world.centerY, 'recycleLink', function () {
-                window.location.href = "http://ceasethegrease.net/recycling/";
+                window.open('http://ceasethegrease.net/recycling/','_blank');
             }, this);
             recycleButton.anchor.setTo(0.5, 0.5);
         }
